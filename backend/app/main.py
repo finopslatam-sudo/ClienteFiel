@@ -1,7 +1,10 @@
 # backend/app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 from app.core.config import settings
+from app.core.rate_limit import limiter
 from app.api import auth
 from app.api import whatsapp as whatsapp_router
 from app.api import services_router
@@ -14,6 +17,9 @@ app = FastAPI(
     docs_url="/docs" if settings.environment == "development" else None,
     redoc_url=None,
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,12 +1,13 @@
 # backend/app/api/auth.py
 from datetime import timedelta
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.security import create_access_token
 from app.core.dependencies import get_current_user
 from app.core.config import settings
+from app.core.rate_limit import limiter
 from app.models.user import User
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, RegisterResponse, UserResponse
 from app.services.auth_service import AuthService
@@ -52,7 +53,9 @@ async def register(
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit("5/15minutes")
 async def login(
+    request: Request,
     payload: LoginRequest,
     response: Response,
     db: Annotated[AsyncSession, Depends(get_db)],
