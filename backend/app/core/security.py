@@ -35,14 +35,15 @@ def decode_access_token(token: str) -> dict[str, Any]:
         )
         return payload
     except JWTError as e:
-        raise ValueError(f"Invalid token: {e}") from e
+        raise ValueError("Invalid token") from e
 
 
 def _get_fernet() -> Fernet:
-    key = settings.encryption_key.encode()
+    import hashlib
     import base64
-    padded = key[:32].ljust(32, b"=")
-    encoded = base64.urlsafe_b64encode(padded)
+    # Deriving 32 bytes via SHA-256 preserves all key entropy regardless of length
+    key_bytes = hashlib.sha256(settings.encryption_key.encode()).digest()
+    encoded = base64.urlsafe_b64encode(key_bytes)
     return Fernet(encoded)
 
 

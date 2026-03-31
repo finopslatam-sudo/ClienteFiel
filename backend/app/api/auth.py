@@ -17,6 +17,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/register", response_model=RegisterResponse, status_code=201)
 async def register(
     payload: RegisterRequest,
+    response: Response,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     service = AuthService(db)
@@ -32,6 +33,18 @@ async def register(
         "tenant_id": str(user.tenant_id),
         "role": user.role.value,
     })
+    refresh_token = create_access_token(
+        {"sub": str(user.id), "type": "refresh"},
+        expires_delta=timedelta(days=settings.jwt_refresh_token_expire_days),
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=settings.environment != "development",
+        samesite="lax",
+        max_age=settings.jwt_refresh_token_expire_days * 24 * 3600,
+    )
     return RegisterResponse(
         user=UserResponse.model_validate(user),
         access_token=access_token,
