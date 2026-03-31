@@ -6,6 +6,7 @@ from app.api import auth
 from app.api import whatsapp as whatsapp_router
 from app.api import services_router
 from app.api import bookings as bookings_router
+from app.api import webhooks as webhooks_router
 
 app = FastAPI(
     title="Cliente Fiel API",
@@ -26,6 +27,7 @@ app.include_router(auth.router, prefix="/api/v1")
 app.include_router(whatsapp_router.router, prefix="/api/v1")
 app.include_router(services_router.router, prefix="/api/v1")
 app.include_router(bookings_router.router, prefix="/api/v1")
+app.include_router(webhooks_router.router, prefix="/api")
 
 
 @app.get("/health")
