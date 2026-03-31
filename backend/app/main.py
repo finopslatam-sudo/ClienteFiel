@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api import auth
 from app.api import whatsapp as whatsapp_router
+from app.api import services_router
+from app.api import bookings as bookings_router
 
 app = FastAPI(
     title="Cliente Fiel API",
@@ -22,6 +24,8 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(whatsapp_router.router, prefix="/api/v1")
+app.include_router(services_router.router, prefix="/api/v1")
+app.include_router(bookings_router.router, prefix="/api/v1")
 
 
 @app.get("/health")
