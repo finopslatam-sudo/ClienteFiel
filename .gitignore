@@ -1,0 +1,31 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+frontend/.next/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Claude
+.claude/
+
+# Vercel
+.vercel/
