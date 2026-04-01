@@ -53,7 +53,10 @@ services:
     command: celery -A app.tasks.celery_app beat --loglevel=info
     env_file: .env
     depends_on:
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   postgres_data:
