@@ -1,6 +1,7 @@
 // frontend/components/sections/Features.tsx
 'use client'
 import { motion } from 'framer-motion'
+import { staggerContainer, fadeInUp } from '@/lib/motion'
 
 const features = [
   {
@@ -31,28 +32,44 @@ const features = [
 
 export function Features() {
   return (
-    <section className="max-w-6xl mx-auto px-4 py-20">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-slate-900">¿Cómo funciona?</h2>
-        <p className="text-slate-600 mt-3 text-lg">
-          Conectas tu WhatsApp Business en 5 minutos. El resto funciona solo.
-        </p>
-      </div>
-      <div className="grid md:grid-cols-2 gap-8">
-        {features.map((f, i) => (
-          <motion.div
-            key={f.title}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            viewport={{ once: true }}
-            className="bg-slate-50 rounded-2xl p-6"
-          >
-            <div className="text-4xl mb-4">{f.icon}</div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">{f.title}</h3>
-            <p className="text-slate-600">{f.description}</p>
-          </motion.div>
-        ))}
+    <section className="relative w-full overflow-hidden" style={{ background: '#020b14' }}>
+      <div className="absolute inset-0 cyber-grid pointer-events-none" />
+      <div className="relative max-w-6xl mx-auto px-4 py-20">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <motion.h2 variants={fadeInUp} className="text-3xl font-bold" style={{ color: '#f1f5f9' }}>
+            ¿Cómo funciona?
+          </motion.h2>
+          <motion.p variants={fadeInUp} className="mt-3 text-lg" style={{ color: '#94a3b8' }}>
+            Conectas tu WhatsApp Business en 5 minutos. El resto funciona solo.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid md:grid-cols-2 gap-8"
+        >
+          {features.map((f) => (
+            <motion.div
+              key={f.title}
+              variants={fadeInUp}
+              whileHover={{ scale: 1.02 }}
+              className="glass-card glass-card-hover p-6"
+            >
+              <div className="text-4xl mb-4">{f.icon}</div>
+              <h3 className="text-xl font-semibold mb-2" style={{ color: '#f1f5f9' }}>{f.title}</h3>
+              <p style={{ color: '#94a3b8' }}>{f.description}</p>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   )
