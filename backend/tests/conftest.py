@@ -1,4 +1,5 @@
 # backend/tests/conftest.py
+import os
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
@@ -7,7 +8,10 @@ from app.main import app as fastapi_app
 from app.models.tenant import Tenant, TenantPlan, TenantStatus
 import app.models  # noqa
 
-DATABASE_URL = "postgresql+asyncpg://clientefiel:password@localhost:5432/clientefiel_db"
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql+asyncpg://clientefiel:password@localhost:5432/clientefiel_db",
+)
 
 
 @pytest_asyncio.fixture(scope="function")
