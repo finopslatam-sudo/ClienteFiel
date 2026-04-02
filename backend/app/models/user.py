@@ -28,4 +28,4 @@ class User(Base, TimestampMixin):
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="users")
+    tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="users")  # noqa: F821

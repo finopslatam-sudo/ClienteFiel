@@ -1,4 +1,3 @@
-import enum
 import uuid
 from datetime import datetime
 from sqlalchemy import String, ForeignKey, Enum as SAEnum

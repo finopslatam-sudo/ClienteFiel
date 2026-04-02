@@ -51,7 +51,7 @@ class BookingService:
             select(Service).where(
                 Service.id == service_id,
                 Service.tenant_id == tenant_id,
-                Service.is_active == True,
+                Service.is_active,
             )
         )
         service = result.scalar_one_or_none()

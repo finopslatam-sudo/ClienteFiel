@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 async def get_booking_with_tenant(booking_id: str):
     """Carga booking con sus relaciones desde DB."""
-    from sqlalchemy.ext.asyncio import AsyncSession
     from sqlalchemy import select
     from sqlalchemy.orm import selectinload
     from app.core.database import AsyncSessionLocal
@@ -39,7 +38,7 @@ async def send_whatsapp_message(tenant_id: str, phone_number: str, template_data
         result = await db.execute(
             select(WhatsappConnection).where(
                 WhatsappConnection.tenant_id == uuid.UUID(tenant_id),
-                WhatsappConnection.is_active == True,
+                WhatsappConnection.is_active,
             )
         )
         conn = result.scalar_one_or_none()

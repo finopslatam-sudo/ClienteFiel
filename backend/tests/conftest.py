@@ -4,6 +4,7 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from app.core.database import Base, get_db
 from app.main import app as fastapi_app
+from app.models.tenant import Tenant, TenantPlan, TenantStatus
 import app.models  # noqa
 
 DATABASE_URL = "postgresql+asyncpg://clientefiel:password@localhost:5432/clientefiel_db"
@@ -43,10 +44,6 @@ async def register_and_login(client: AsyncClient, email: str, business: str) -> 
     })
     assert response.status_code == 201
     return response.json()["access_token"]
-
-
-import pytest_asyncio
-from app.models.tenant import Tenant, TenantPlan, TenantStatus
 
 
 @pytest_asyncio.fixture

@@ -4,7 +4,6 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from app.core.database import Base
 from app.services.auth_service import AuthService
-from app.models import Tenant, User
 import app.models  # noqa
 
 DATABASE_URL = "postgresql+asyncpg://clientefiel:password@localhost:5432/clientefiel_db"

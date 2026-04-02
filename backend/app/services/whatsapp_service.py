@@ -100,7 +100,7 @@ class WhatsappService:
         result = await self.db.execute(
             select(WhatsappConnection).where(
                 WhatsappConnection.tenant_id == uuid.UUID(tenant_id),
-                WhatsappConnection.is_active == True,
+                WhatsappConnection.is_active,
             )
         )
         return result.scalar_one_or_none()

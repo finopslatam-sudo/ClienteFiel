@@ -19,7 +19,7 @@ async def list_services(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     result = await db.execute(
-        select(Service).where(Service.tenant_id == current_tenant.id, Service.is_active == True)
+        select(Service).where(Service.tenant_id == current_tenant.id, Service.is_active)
     )
     return [ServiceResponse.model_validate(s) for s in result.scalars().all()]
 

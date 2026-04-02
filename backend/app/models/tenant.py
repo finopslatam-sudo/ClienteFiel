@@ -37,4 +37,4 @@ class Tenant(Base, TimestampMixin):
     )
     trial_ends_at: Mapped[datetime | None] = mapped_column(nullable=True)
 
-    users: Mapped[list["User"]] = relationship("User", back_populates="tenant")
+    users: Mapped[list["User"]] = relationship("User", back_populates="tenant")  # noqa: F821

@@ -81,7 +81,7 @@ async def receive_whatsapp_webhook(
                     result = await db.execute(
                         select(WhatsappConnection).where(
                             WhatsappConnection.phone_number_id == phone_number_id,
-                            WhatsappConnection.is_active == True,
+                            WhatsappConnection.is_active,
                         )
                     )
                     conn = result.scalar_one_or_none()

@@ -26,7 +26,6 @@ async def test_exchange_code_for_token_calls_meta(db_session: AsyncSession):
 async def test_connect_saves_encrypted_credentials(db_session: AsyncSession, tenant):
     """connect() guarda credenciales cifradas en DB, nunca en texto plano."""
     from app.services.whatsapp_service import WhatsappService
-    from app.models.whatsapp import WhatsappConnection
 
     with respx.mock:
         respx.get(META_EXCHANGE_URL).mock(
@@ -64,7 +63,7 @@ async def test_connect_replaces_existing_connection(db_session: AsyncSession, te
             return_value=httpx.Response(200, json={"display_phone_number": "+56900000001"})
         )
         service = WhatsappService(db_session)
-        conn1 = await service.connect(str(tenant.id), "code1", "phone-1", "waba-1")
+        await service.connect(str(tenant.id), "code1", "phone-1", "waba-1")
 
         respx.get(META_EXCHANGE_URL).mock(
             return_value=httpx.Response(200, json={"access_token": "token-v2"})
