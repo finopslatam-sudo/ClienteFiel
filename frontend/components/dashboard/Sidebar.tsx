@@ -16,10 +16,20 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="w-56 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0">
-      <div className="p-6 border-b border-slate-200">
-        <span className="font-bold text-lg text-indigo-600">Cliente Fiel</span>
+    <aside
+      className="w-56 flex flex-col h-screen sticky top-0"
+      style={{
+        background: 'rgba(2, 11, 20, 0.98)',
+        borderRight: '1px solid rgba(6, 182, 212, 0.08)',
+      }}
+    >
+      <div
+        className="p-6"
+        style={{ borderBottom: '1px solid rgba(6, 182, 212, 0.08)' }}
+      >
+        <span className="font-bold text-lg" style={{ color: '#f1f5f9' }}>Cliente Fiel</span>
       </div>
+
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href)
@@ -27,11 +37,29 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+              style={
                 isActive
-                  ? 'bg-indigo-50 text-indigo-700'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-              }`}
+                  ? {
+                      background: 'rgba(6, 182, 212, 0.1)',
+                      borderLeft: '2px solid #06b6d4',
+                      color: '#06b6d4',
+                      paddingLeft: '10px',
+                    }
+                  : { color: '#94a3b8' }
+              }
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = 'rgba(6, 182, 212, 0.05)'
+                  e.currentTarget.style.color = '#f1f5f9'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = 'transparent'
+                  e.currentTarget.style.color = '#94a3b8'
+                }
+              }}
             >
               <span>{item.icon}</span>
               {item.label}
@@ -39,10 +67,20 @@ export function Sidebar() {
           )
         })}
       </nav>
-      <div className="p-4 border-t border-slate-200">
+
+      <div className="p-4" style={{ borderTop: '1px solid rgba(6, 182, 212, 0.08)' }}>
         <button
           onClick={() => logout()}
-          className="w-full text-left text-sm text-slate-500 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+          className="w-full text-left text-sm px-3 py-2 rounded-lg transition-colors"
+          style={{ color: '#475569' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#94a3b8'
+            e.currentTarget.style.background = 'rgba(6, 182, 212, 0.05)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#475569'
+            e.currentTarget.style.background = 'transparent'
+          }}
         >
           Cerrar sesión
         </button>

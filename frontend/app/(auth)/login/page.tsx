@@ -6,7 +6,9 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { motion } from 'framer-motion'
 import { login } from '@/lib/auth'
+import { fadeInUp } from '@/lib/motion'
 
 const schema = z.object({
   email: z.string().email('Email inválido'),
@@ -32,35 +34,52 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-      <h1 className="text-2xl font-bold text-slate-900 mb-2">Iniciar sesión</h1>
-      <p className="text-slate-500 text-sm mb-6">Bienvenido de vuelta</p>
+    <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="glass-card p-8">
+      <h1 className="text-2xl font-bold mb-2" style={{ color: '#f1f5f9' }}>
+        Iniciar sesión
+      </h1>
+      <p className="text-sm mb-6" style={{ color: '#94a3b8' }}>Bienvenido de vuelta</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: '#94a3b8' }}>
+            Email
+          </label>
           <input
             {...register('email')}
             type="email"
             placeholder="tu@negocio.cl"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="input-dark w-full px-3 py-2 text-sm"
           />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+          {errors.email && (
+            <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.email.message}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: '#94a3b8' }}>
+            Contraseña
+          </label>
           <input
             {...register('password')}
             type="password"
             placeholder="••••••••"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="input-dark w-full px-3 py-2 text-sm"
           />
-          {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+          {errors.password && (
+            <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.password.message}</p>
+          )}
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
+          <div
+            className="px-3 py-2 rounded-lg text-sm"
+            style={{
+              background: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.3)',
+              color: '#fca5a5',
+            }}
+          >
             {error}
           </div>
         )}
@@ -68,18 +87,18 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="btn-cyan w-full py-3 rounded-lg text-sm"
         >
           {isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión'}
         </button>
       </form>
 
-      <p className="text-center text-sm text-slate-500 mt-6">
+      <p className="text-center text-sm mt-6" style={{ color: '#94a3b8' }}>
         ¿No tienes cuenta?{' '}
-        <Link href="/registro" className="text-indigo-600 font-medium hover:underline">
+        <Link href="/registro" className="font-medium hover:underline" style={{ color: '#06b6d4' }}>
           Prueba gratis 14 días
         </Link>
       </p>
-    </div>
+    </motion.div>
   )
 }

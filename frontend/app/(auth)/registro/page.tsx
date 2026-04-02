@@ -6,7 +6,9 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { motion } from 'framer-motion'
 import { register as registerUser } from '@/lib/auth'
+import { fadeInUp } from '@/lib/motion'
 
 const schema = z.object({
   business_name: z.string().min(2, 'Nombre del negocio requerido'),
@@ -34,45 +36,66 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-      <h1 className="text-2xl font-bold text-slate-900 mb-2">Crear tu cuenta gratis</h1>
-      <p className="text-slate-500 text-sm mb-6">14 días gratis · Sin tarjeta de crédito</p>
+    <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="glass-card p-8">
+      <h1 className="text-2xl font-bold mb-2" style={{ color: '#f1f5f9' }}>
+        Crear tu cuenta gratis
+      </h1>
+      <p className="text-sm mb-6" style={{ color: '#94a3b8' }}>14 días gratis · Sin tarjeta de crédito</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Nombre del negocio</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: '#94a3b8' }}>
+            Nombre del negocio
+          </label>
           <input
             {...register('business_name')}
             placeholder="Peluquería Style"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="input-dark w-full px-3 py-2 text-sm"
           />
-          {errors.business_name && <p className="text-red-500 text-xs mt-1">{errors.business_name.message}</p>}
+          {errors.business_name && (
+            <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.business_name.message}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: '#94a3b8' }}>
+            Email
+          </label>
           <input
             {...register('email')}
             type="email"
             placeholder="tu@negocio.cl"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="input-dark w-full px-3 py-2 text-sm"
           />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+          {errors.email && (
+            <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.email.message}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: '#94a3b8' }}>
+            Contraseña
+          </label>
           <input
             {...register('password')}
             type="password"
             placeholder="Mínimo 8 caracteres"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="input-dark w-full px-3 py-2 text-sm"
           />
-          {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+          {errors.password && (
+            <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.password.message}</p>
+          )}
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
+          <div
+            className="px-3 py-2 rounded-lg text-sm"
+            style={{
+              background: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.3)',
+              color: '#fca5a5',
+            }}
+          >
             {error}
           </div>
         )}
@@ -80,22 +103,22 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="btn-cyan w-full py-3 rounded-lg text-sm"
         >
           {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta gratis →'}
         </button>
 
-        <p className="text-center text-xs text-slate-400">
+        <p className="text-center text-xs" style={{ color: '#475569' }}>
           Sin tarjeta hasta el día 14 · Cancela cuando quieras
         </p>
       </form>
 
-      <p className="text-center text-sm text-slate-500 mt-6">
+      <p className="text-center text-sm mt-6" style={{ color: '#94a3b8' }}>
         ¿Ya tienes cuenta?{' '}
-        <Link href="/login" className="text-indigo-600 font-medium hover:underline">
+        <Link href="/login" className="font-medium hover:underline" style={{ color: '#06b6d4' }}>
           Iniciar sesión
         </Link>
       </p>
-    </div>
+    </motion.div>
   )
 }
