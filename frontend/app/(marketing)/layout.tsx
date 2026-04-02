@@ -4,21 +4,35 @@ import Link from 'next/link'
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-200">
+      <header
+        className="sticky top-0 z-50 backdrop-blur-xl"
+        style={{
+          background: 'rgba(2, 11, 20, 0.85)',
+          borderBottom: '1px solid rgba(6, 182, 212, 0.08)',
+        }}
+      >
         <nav className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="font-bold text-xl text-indigo-600">
+          <Link href="/" className="font-bold text-xl" style={{ color: '#f1f5f9' }}>
             Cliente Fiel
           </Link>
           <div className="flex items-center gap-6">
-            <Link href="/precios" className="text-slate-600 hover:text-slate-900 text-sm">
+            <Link
+              href="/precios"
+              className="text-sm transition-colors"
+              style={{ color: '#94a3b8' }}
+            >
               Precios
             </Link>
-            <Link href="/login" className="text-slate-600 hover:text-slate-900 text-sm">
+            <Link
+              href="/login"
+              className="text-sm transition-colors"
+              style={{ color: '#94a3b8' }}
+            >
               Iniciar sesión
             </Link>
             <Link
               href="/registro"
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+              className="btn-ghost-cyan px-4 py-2 rounded-lg text-sm font-medium"
             >
               Prueba gratis
             </Link>
@@ -26,11 +40,17 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         </nav>
       </header>
       <main>{children}</main>
-      <footer className="bg-slate-900 text-slate-400 py-12 mt-20">
+      <footer
+        className="py-12 mt-20"
+        style={{
+          background: '#020b14',
+          borderTop: '1px solid rgba(6, 182, 212, 0.08)',
+        }}
+      >
         <div className="max-w-6xl mx-auto px-4 text-center text-sm">
-          <p className="font-semibold text-white mb-2">Cliente Fiel</p>
-          <p>Automatiza tu WhatsApp Business. Sin apps, sin complicaciones.</p>
-          <p className="mt-4">© 2026 Cliente Fiel. Chile.</p>
+          <p className="font-semibold mb-2" style={{ color: '#f1f5f9' }}>Cliente Fiel</p>
+          <p style={{ color: '#475569' }}>Automatiza tu WhatsApp Business. Sin apps, sin complicaciones.</p>
+          <p className="mt-4" style={{ color: '#475569' }}>© 2026 Cliente Fiel. Chile.</p>
         </div>
       </footer>
     </>
