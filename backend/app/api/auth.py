@@ -45,6 +45,7 @@ async def register(
         secure=settings.environment != "development",
         samesite="lax",
         max_age=settings.jwt_refresh_token_expire_days * 24 * 3600,
+        domain=settings.cookie_domain or None,
     )
     return RegisterResponse(
         user=UserResponse.model_validate(user),
@@ -82,13 +83,14 @@ async def login(
         secure=settings.environment != "development",
         samesite="lax",
         max_age=settings.jwt_refresh_token_expire_days * 24 * 3600,
+        domain=settings.cookie_domain or None,
     )
     return TokenResponse(access_token=access_token)
 
 
 @router.post("/logout")
 async def logout(response: Response):
-    response.delete_cookie("refresh_token")
+    response.delete_cookie("refresh_token", domain=settings.cookie_domain or None)
     return {"message": "Logged out"}
 
 

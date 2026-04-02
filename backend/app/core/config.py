@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     stripe_premium_price_id: str
     celery_broker_url: str
     celery_result_backend: str
+    cookie_domain: str = ""
 
     model_config = {"env_file": ".env"}
 
