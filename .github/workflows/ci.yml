@@ -107,7 +107,7 @@ jobs:
 
       - name: Build
         env:
-          NEXT_PUBLIC_API_URL: https://placeholder.railway.app
+          NEXT_PUBLIC_API_URL: https://api.clientefiel.riava.cl
           NEXT_PUBLIC_META_APP_ID: placeholder
           NEXT_PUBLIC_META_SIGNUP_CONFIG_ID: placeholder
           NEXT_PUBLIC_SITE_URL: https://placeholder.vercel.app

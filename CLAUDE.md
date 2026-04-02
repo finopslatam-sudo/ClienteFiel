@@ -2,7 +2,7 @@
 
 Este documento establece estándares para el desarrollo de **Cliente Fiel** — SaaS de reservas y fidelización que automatiza el WhatsApp Business de cada cliente.
 
-- **Backend:** FastAPI (Python) → Railway / Render / VPS
+- **Backend:** FastAPI (Python) → Hetzner VPS (Ubuntu 22.04)
 - **Frontend:** Next.js 14 (TypeScript) → Vercel
 - **DB:** PostgreSQL + Redis
 - **Jobs:** Celery + Celery Beat
@@ -43,7 +43,7 @@ Este documento establece estándares para el desarrollo de **Cliente Fiel** — 
 ```
 Frontend (Next.js → Vercel)
     ↓ REST/JSON — nunca expone secrets
-Backend (FastAPI → Railway/Render)
+Backend (FastAPI → Hetzner VPS)
     ↓ Services
 Lógica de negocio
     ↓ ORM (SQLAlchemy)
@@ -120,7 +120,7 @@ const securityHeaders = [
 ```
 
 ### Variables de entorno:
-- Backend: `.env` (Railway/Render env vars en producción)
+- Backend: `.env` en `/var/www/clientefiel/backend/.env` en el servidor Hetzner
 - Frontend: `.env.local` (Vercel env vars en producción)
 - `NEXT_PUBLIC_` solo para datos no sensibles (URL del API, Meta App ID público)
 - ❌ Nunca: JWT secret, WhatsApp tokens, Stripe secret en frontend
@@ -304,17 +304,23 @@ test: agregar test de aislamiento multi-tenant
 - Preview deployments en PRs
 - Variables en Vercel Dashboard (no en código)
 
-### Backend → Railway / Render
-- Dockerfile en `backend/`
-- Variables de entorno en panel del hosting
-- PostgreSQL y Redis como servicios managed o external
+### Backend → Hetzner VPS (46.225.154.115)
+- Python 3.12 + virtualenv + uvicorn + systemd
+- Nginx como reverse proxy con SSL (Certbot / Let's Encrypt)
+- PostgreSQL y Redis corriendo en el mismo servidor
+- Variables de entorno en `/var/www/clientefiel/backend/.env`
+- Deploy automático via GitHub Actions (SSH en cada push a `main`)
+
+### Dominios
+- `riava.cl` → Landing (Vercel)
+- `clientefiel.riava.cl` → Frontend SaaS (Vercel)
+- `api.clientefiel.riava.cl` → Backend (Hetzner)
 
 ### CI/CD (GitHub Actions):
 1. Lint + type check
 2. Tests con PostgreSQL + Redis reales
-3. Build Docker (backend)
-4. Deploy staging → smoke tests
-5. Deploy producción (aprobación manual)
+3. Deploy backend: SSH → git pull → pip install → alembic → restart
+4. Deploy frontend: Vercel auto-deploy en push a `main`
 
 ---
 
@@ -322,4 +328,4 @@ test: agregar test de aislamiento multi-tenant
 
 > Si compromete seguridad, aislamiento de tenants, o la integridad de las credenciales WhatsApp de los clientes — está prohibido.
 
-*Última actualización: 2026-03-30*
+*Última actualización: 2026-04-02*
