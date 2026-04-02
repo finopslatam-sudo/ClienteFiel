@@ -13,7 +13,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check SSH secrets
+        id: check
+        run: |
+          if [ -z "$SSH_HOST" ]; then
+            echo "SSH_HOST secret not configured — skipping deploy"
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+
       - name: Deploy via SSH
+        if: steps.check.outputs.configured == 'true'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}

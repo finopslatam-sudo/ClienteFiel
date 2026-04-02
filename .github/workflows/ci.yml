@@ -67,7 +67,7 @@ jobs:
           META_APP_ID: test-app-id
           META_APP_SECRET: test-app-secret
           META_WEBHOOK_VERIFY_TOKEN: test-verify-token
-          ENCRYPTION_KEY: ${{ secrets.TEST_ENCRYPTION_KEY }}
+          ENCRYPTION_KEY: AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=
           STRIPE_SECRET_KEY: sk_test_placeholder
           STRIPE_WEBHOOK_SECRET: whsec_test_placeholder
           STRIPE_BASIC_PRICE_ID: price_test_basic
