@@ -1,56 +1,22 @@
+import types
 import pytest
+import pytest_asyncio
+from decimal import Decimal
+from datetime import datetime, time, timezone, timedelta
+from zoneinfo import ZoneInfo
+
 from tests.conftest import register_and_login
 from app.models.availability import AvailabilityRule, AvailabilityOverride
-from app.models.booking import Booking
+from app.models.booking import Booking, BookingStatus
+from app.schemas.availability import AvailabilityRuleCreate
+from app.services.availability_service import _generate_slots
+from app.services.booking_service import BookingService
+from app.models.service import Service
 
 
-@pytest.mark.asyncio
-async def test_upsert_and_get_rules(client):
-    token = await register_and_login(client, "avail@test.com", "AvailBiz")
-    headers = {"Authorization": f"Bearer {token}"}
-
-    payload = {
-        "rules": [{
-            "day_of_week": 0,
-            "start_time": "09:00:00",
-            "end_time": "18:00:00",
-            "slot_duration_minutes": 30,
-            "buffer_minutes": 0,
-            "is_active": True,
-            "timezone": "America/Santiago",
-        }]
-    }
-    resp = await client.put("/api/v1/availability/rules", json=payload, headers=headers)
-    assert resp.status_code == 200
-    assert len(resp.json()["rules"]) == 1
-    assert resp.json()["rules"][0]["day_of_week"] == 0
-
-    resp2 = await client.get("/api/v1/availability/rules", headers=headers)
-    assert resp2.status_code == 200
-    assert len(resp2.json()["rules"]) == 1
-
-
-@pytest.mark.asyncio
-async def test_get_slots_no_rules_returns_empty(client):
-    token = await register_and_login(client, "slots@test.com", "SlotBiz")
-    headers = {"Authorization": f"Bearer {token}"}
-
-    svc_resp = await client.post(
-        "/api/v1/services",
-        json={"name": "Corte", "duration_minutes": 30, "price": "15000"},
-        headers=headers,
-    )
-    assert svc_resp.status_code == 201
-    service_id = svc_resp.json()["id"]
-
-    resp = await client.get(
-        "/api/v1/availability/slots",
-        params={"date": "2026-05-11", "service_id": service_id},
-        headers=headers,
-    )
-    assert resp.status_code == 200
-    assert resp.json()["slots"] == []
-
+# ---------------------------------------------------------------------------
+# Task 1: Models importable
+# ---------------------------------------------------------------------------
 
 def test_models_importable():
     assert AvailabilityRule.__tablename__ == "availability_rules"
@@ -58,9 +24,9 @@ def test_models_importable():
     assert hasattr(Booking, "ends_at")
 
 
-from datetime import time
-from app.schemas.availability import AvailabilityRuleCreate
-
+# ---------------------------------------------------------------------------
+# Task 3: Schema validation
+# ---------------------------------------------------------------------------
 
 def test_rule_create_validates_day_of_week():
     with pytest.raises(Exception):
@@ -90,18 +56,19 @@ def test_rule_end_before_start_rejected():
         )
 
 
-import types
-from datetime import datetime, timezone, timedelta
-from zoneinfo import ZoneInfo
-from app.services.availability_service import _generate_slots
-from app.models.booking import BookingStatus
-
+# ---------------------------------------------------------------------------
+# Task 4: Slot generation
+# ---------------------------------------------------------------------------
 
 def _utc_naive(dt: datetime) -> datetime:
     return dt.astimezone(timezone.utc).replace(tzinfo=None)
 
 
-def _make_booking(scheduled_utc: datetime, duration_min: int, status: BookingStatus = BookingStatus.confirmed) -> types.SimpleNamespace:
+def _make_booking(
+    scheduled_utc: datetime,
+    duration_min: int,
+    status: BookingStatus = BookingStatus.confirmed,
+) -> types.SimpleNamespace:
     """Return a lightweight duck-typed booking without a DB session."""
     return types.SimpleNamespace(
         scheduled_at=scheduled_utc,
@@ -171,11 +138,9 @@ def test_generate_slots_buffer_blocks_adjacent():
     assert slots[3]["available"] is True   # 10:30
 
 
-import pytest_asyncio
-from decimal import Decimal
-from app.services.booking_service import BookingService
-from app.models.service import Service
-
+# ---------------------------------------------------------------------------
+# Task 5: Double-booking prevention
+# ---------------------------------------------------------------------------
 
 @pytest_asyncio.fixture
 async def service_obj(db_session, tenant):
@@ -234,3 +199,55 @@ async def test_non_overlapping_bookings_succeed(db_session, tenant, service_obj)
     )
     assert b1.id != b2.id
     assert b1.ends_at is not None
+
+
+# ---------------------------------------------------------------------------
+# Task 6: Integration via HTTP client
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_upsert_and_get_rules(client):
+    token = await register_and_login(client, "avail@test.com", "AvailBiz")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    payload = {
+        "rules": [{
+            "day_of_week": 0,
+            "start_time": "09:00:00",
+            "end_time": "18:00:00",
+            "slot_duration_minutes": 30,
+            "buffer_minutes": 0,
+            "is_active": True,
+            "timezone": "America/Santiago",
+        }]
+    }
+    resp = await client.put("/api/v1/availability/rules", json=payload, headers=headers)
+    assert resp.status_code == 200
+    assert len(resp.json()["rules"]) == 1
+    assert resp.json()["rules"][0]["day_of_week"] == 0
+
+    resp2 = await client.get("/api/v1/availability/rules", headers=headers)
+    assert resp2.status_code == 200
+    assert len(resp2.json()["rules"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_get_slots_no_rules_returns_empty(client):
+    token = await register_and_login(client, "slots@test.com", "SlotBiz")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    svc_resp = await client.post(
+        "/api/v1/services",
+        json={"name": "Corte", "duration_minutes": 30, "price": "15000"},
+        headers=headers,
+    )
+    assert svc_resp.status_code == 201
+    service_id = svc_resp.json()["id"]
+
+    resp = await client.get(
+        "/api/v1/availability/slots",
+        params={"date": "2026-05-11", "service_id": service_id},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["slots"] == []
