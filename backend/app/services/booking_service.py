@@ -1,7 +1,7 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, text
 from app.models.booking import Booking, BookingStatus, BookingCreatedBy
 from app.models.customer import Customer, CustomerStatus
 from app.models.service import Service
@@ -43,7 +43,6 @@ class BookingService:
         scheduled_at: datetime,
         created_by: BookingCreatedBy = BookingCreatedBy.admin,
     ) -> Booking:
-        # Normalize to UTC naive — the DB column is TIMESTAMP WITHOUT TIME ZONE
         if scheduled_at.tzinfo is not None:
             scheduled_at = scheduled_at.astimezone(timezone.utc).replace(tzinfo=None)
 
@@ -58,6 +57,25 @@ class BookingService:
         if not service:
             raise ValueError("Service not found or inactive")
 
+        ends_at = scheduled_at + timedelta(minutes=service.duration_minutes)
+
+        # Advisory lock scoped to this tenant prevents concurrent double-booking
+        lock_key = abs(tenant_id.int) % (2**63)
+        await self.db.execute(
+            text("SELECT pg_advisory_xact_lock(:key)").bindparams(key=lock_key)
+        )
+
+        conflict_result = await self.db.execute(
+            select(Booking).where(
+                Booking.tenant_id == tenant_id,
+                Booking.scheduled_at < ends_at,
+                Booking.ends_at > scheduled_at,
+                Booking.status.not_in([BookingStatus.canceled, BookingStatus.no_show]),
+            )
+        )
+        if conflict_result.scalar_one_or_none():
+            raise ValueError("Time slot already booked")
+
         customer = await self._get_or_create_customer(tenant_id, customer_phone, customer_name)
 
         booking = Booking(
@@ -65,6 +83,7 @@ class BookingService:
             customer_id=customer.id,
             service_id=service_id,
             scheduled_at=scheduled_at,
+            ends_at=ends_at,
             status=BookingStatus.confirmed,
             created_by=created_by,
         )
