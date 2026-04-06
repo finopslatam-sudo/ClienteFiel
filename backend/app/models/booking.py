@@ -38,6 +38,7 @@ class Booking(Base, TimestampMixin):
         UUID(as_uuid=True), ForeignKey("services.id"), nullable=False
     )
     scheduled_at: Mapped[datetime] = mapped_column(nullable=False, index=True)
+    ends_at: Mapped[datetime | None] = mapped_column(nullable=True, index=True)
     status: Mapped[BookingStatus] = mapped_column(
         SAEnum(BookingStatus), default=BookingStatus.pending, nullable=False
     )

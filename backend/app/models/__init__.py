@@ -2,7 +2,7 @@ from app.models.tenant import Tenant, TenantPlan, TenantStatus
 from app.models.user import User, UserRole
 from app.models.whatsapp import WhatsappConnection
 from app.models.service import Service
-from app.models.time_slot import TimeSlot
+from app.models.availability import AvailabilityRule, AvailabilityOverride
 from app.models.customer import Customer, CustomerStatus
 from app.models.booking import Booking, BookingStatus, BookingCreatedBy
 from app.models.reminder import Reminder, ReminderType, ReminderStatus
@@ -14,7 +14,7 @@ __all__ = [
     "User", "UserRole",
     "WhatsappConnection",
     "Service",
-    "TimeSlot",
+    "AvailabilityRule", "AvailabilityOverride",
     "Customer", "CustomerStatus",
     "Booking", "BookingStatus", "BookingCreatedBy",
     "Reminder", "ReminderType", "ReminderStatus",
