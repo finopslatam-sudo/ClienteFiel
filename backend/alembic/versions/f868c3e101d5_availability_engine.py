@@ -41,7 +41,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tenant_id", "day_of_week", name="uq_availability_tenant_day"),
     )
-    op.create_index("ix_availability_rules_tenant_id", "availability_rules", ["tenant_id"])
+    op.create_index(op.f("ix_availability_rules_tenant_id"), "availability_rules", ["tenant_id"], unique=False)
 
     # Create availability_overrides
     op.create_table(
@@ -57,21 +57,21 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tenant_id", "override_date", name="uq_override_tenant_date"),
     )
-    op.create_index("ix_availability_overrides_tenant_id", "availability_overrides", ["tenant_id"])
-    op.create_index("ix_availability_overrides_date", "availability_overrides", ["override_date"])
+    op.create_index(op.f("ix_availability_overrides_tenant_id"), "availability_overrides", ["tenant_id"], unique=False)
+    op.create_index(op.f("ix_availability_overrides_date"), "availability_overrides", ["override_date"], unique=False)
 
     # Add ends_at to bookings
     op.add_column("bookings", sa.Column("ends_at", sa.DateTime(), nullable=True))
-    op.create_index("ix_bookings_ends_at", "bookings", ["ends_at"])
+    op.create_index(op.f("ix_bookings_ends_at"), "bookings", ["ends_at"], unique=False)
 
 
 def downgrade() -> None:
-    op.drop_index("ix_bookings_ends_at", table_name="bookings")
+    op.drop_index(op.f("ix_bookings_ends_at"), table_name="bookings")
     op.drop_column("bookings", "ends_at")
-    op.drop_index("ix_availability_overrides_date", table_name="availability_overrides")
-    op.drop_index("ix_availability_overrides_tenant_id", table_name="availability_overrides")
+    op.drop_index(op.f("ix_availability_overrides_date"), table_name="availability_overrides")
+    op.drop_index(op.f("ix_availability_overrides_tenant_id"), table_name="availability_overrides")
     op.drop_table("availability_overrides")
-    op.drop_index("ix_availability_rules_tenant_id", table_name="availability_rules")
+    op.drop_index(op.f("ix_availability_rules_tenant_id"), table_name="availability_rules")
     op.drop_table("availability_rules")
     op.create_table(
         "time_slots",
@@ -85,3 +85,4 @@ def downgrade() -> None:
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
+    op.create_index(op.f("ix_time_slots_tenant_id"), "time_slots", ["tenant_id"], unique=False)
