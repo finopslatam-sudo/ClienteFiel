@@ -1,6 +1,55 @@
 import pytest
+from tests.conftest import register_and_login
 from app.models.availability import AvailabilityRule, AvailabilityOverride
 from app.models.booking import Booking
+
+
+@pytest.mark.asyncio
+async def test_upsert_and_get_rules(client):
+    token = await register_and_login(client, "avail@test.com", "AvailBiz")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    payload = {
+        "rules": [{
+            "day_of_week": 0,
+            "start_time": "09:00:00",
+            "end_time": "18:00:00",
+            "slot_duration_minutes": 30,
+            "buffer_minutes": 0,
+            "is_active": True,
+            "timezone": "America/Santiago",
+        }]
+    }
+    resp = await client.put("/api/v1/availability/rules", json=payload, headers=headers)
+    assert resp.status_code == 200
+    assert len(resp.json()["rules"]) == 1
+    assert resp.json()["rules"][0]["day_of_week"] == 0
+
+    resp2 = await client.get("/api/v1/availability/rules", headers=headers)
+    assert resp2.status_code == 200
+    assert len(resp2.json()["rules"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_get_slots_no_rules_returns_empty(client):
+    token = await register_and_login(client, "slots@test.com", "SlotBiz")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    svc_resp = await client.post(
+        "/api/v1/services",
+        json={"name": "Corte", "duration_minutes": 30, "price": "15000"},
+        headers=headers,
+    )
+    assert svc_resp.status_code == 201
+    service_id = svc_resp.json()["id"]
+
+    resp = await client.get(
+        "/api/v1/availability/slots",
+        params={"date": "2026-05-11", "service_id": service_id},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["slots"] == []
 
 
 def test_models_importable():
