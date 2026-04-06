@@ -16,6 +16,7 @@ class BookingResponse(BaseModel):
     customer_id: uuid.UUID
     service_id: uuid.UUID
     scheduled_at: datetime
+    ends_at: datetime | None = None
     status: BookingStatus
     created_by: BookingCreatedBy
     created_at: datetime
