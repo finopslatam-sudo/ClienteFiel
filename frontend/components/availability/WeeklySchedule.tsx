@@ -5,7 +5,16 @@ import { useAvailabilityRules, useUpsertRules } from '@/lib/hooks/useAvailabilit
 import { AvailabilityRuleInput } from '@/lib/api/availability'
 
 const DAY_NAMES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
-const SLOT_OPTIONS = [15, 30, 45, 60]
+const SLOT_OPTIONS = [
+  { value: 15, label: '15 min' },
+  { value: 30, label: '30 min' },
+  { value: 45, label: '45 min' },
+  { value: 60, label: '1 hora' },
+  { value: 75, label: '1 hora 15 min' },
+  { value: 90, label: '1 hora 30 min' },
+  { value: 105, label: '1 hora 45 min' },
+  { value: 120, label: '2 horas' },
+]
 const BUFFER_OPTIONS = [0, 5, 10, 15, 30]
 
 interface DayConfig {
@@ -146,7 +155,7 @@ export function WeeklySchedule() {
 
             {/* Slot duration */}
             <div className="flex items-center gap-2">
-              <span className="text-xs" style={{ color: '#94a3b8' }}>Slot</span>
+              <span className="text-xs" style={{ color: '#94a3b8' }}>Duración del servicio</span>
               <select
                 value={day.slot_duration_minutes}
                 disabled={!day.enabled}
@@ -158,15 +167,15 @@ export function WeeklySchedule() {
                   color: '#f1f5f9',
                 }}
               >
-                {SLOT_OPTIONS.map(v => (
-                  <option key={v} value={v}>{v} min</option>
+                {SLOT_OPTIONS.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
                 ))}
               </select>
             </div>
 
             {/* Buffer */}
             <div className="flex items-center gap-2">
-              <span className="text-xs" style={{ color: '#94a3b8' }}>Buffer</span>
+              <span className="text-xs" style={{ color: '#94a3b8' }}>Tiempo entre citas</span>
               <select
                 value={day.buffer_minutes}
                 disabled={!day.enabled}
@@ -179,7 +188,7 @@ export function WeeklySchedule() {
                 }}
               >
                 {BUFFER_OPTIONS.map(v => (
-                  <option key={v} value={v}>{v === 0 ? 'Sin buffer' : `${v} min`}</option>
+                  <option key={v} value={v}>{v === 0 ? 'Sin pausa' : `${v} min`}</option>
                 ))}
               </select>
             </div>
