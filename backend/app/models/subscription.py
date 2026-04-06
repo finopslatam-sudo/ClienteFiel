@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import String, ForeignKey, Enum as SAEnum
+from sqlalchemy import ForeignKey, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from app.core.database import Base
@@ -18,8 +18,6 @@ class Subscription(Base, TimestampMixin):
         UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"),
         unique=True, nullable=False
     )
-    stripe_customer_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    stripe_subscription_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     plan: Mapped[TenantPlan] = mapped_column(
         SAEnum(TenantPlan), default=TenantPlan.basic, nullable=False
     )

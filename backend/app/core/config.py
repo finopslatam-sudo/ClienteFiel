@@ -15,11 +15,6 @@ class Settings(BaseSettings):
     meta_app_secret: str
     meta_webhook_verify_token: str
     encryption_key: str
-    stripe_secret_key: str
-    stripe_webhook_secret: str
-    stripe_basic_price_id: str
-    stripe_medium_price_id: str
-    stripe_premium_price_id: str
     celery_broker_url: str
     celery_result_backend: str
     cookie_domain: str = ""
