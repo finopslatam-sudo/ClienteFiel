@@ -1,0 +1,482 @@
+<style>
+  /* === CYBER GRID THEME === */
+  :root {
+    --bg: #020b14;
+    --bg2: #030d1a;
+    --cyan: #06b6d4;
+    --cyan-dim: rgba(6,182,212,0.15);
+    --cyan-glow: rgba(6,182,212,0.4);
+    --indigo: #6366f1;
+    --text: #e2e8f0;
+    --text-dim: #64748b;
+    --glass: rgba(6,182,212,0.04);
+    --glass-border: rgba(6,182,212,0.12);
+  }
+
+  .zone-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin: 32px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .zone-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--glass-border);
+  }
+
+  /* ===== LANDING MOCKUP ===== */
+  .landing-mock {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+    background: var(--bg);
+  }
+
+  .mock-navbar {
+    background: rgba(2,11,20,0.8);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(8px);
+  }
+  .mock-logo { color: var(--cyan); font-weight: 800; font-size: 13px; letter-spacing: 0.5px; }
+  .mock-nav-links { display: flex; gap: 16px; }
+  .mock-nav-link { color: var(--text-dim); font-size: 10px; }
+  .mock-nav-cta {
+    background: var(--cyan);
+    color: var(--bg);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .mock-hero {
+    position: relative;
+    padding: 48px 32px 40px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .mock-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(6,182,212,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(6,182,212,0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .mock-hero-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6,182,212,0.18) 0%, transparent 65%);
+  }
+  .mock-hero-glow2 {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 40% 40% at 20% 80%, rgba(99,102,241,0.1) 0%, transparent 60%);
+  }
+  .mock-badge {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    background: rgba(6,182,212,0.1);
+    border: 1px solid rgba(6,182,212,0.3);
+    color: #67e8f9;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    letter-spacing: 0.4px;
+  }
+  .mock-h1 {
+    position: relative;
+    z-index: 1;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+  .mock-h1 span {
+    color: var(--cyan);
+    text-shadow: 0 0 30px rgba(6,182,212,0.6);
+  }
+  .mock-p {
+    position: relative;
+    z-index: 1;
+    color: var(--text-dim);
+    font-size: 11px;
+    max-width: 320px;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+  }
+  .mock-ctas {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .mock-cta-primary {
+    background: var(--cyan);
+    color: var(--bg);
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+  }
+  .mock-cta-secondary {
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 11px;
+    background: var(--glass);
+  }
+  .mock-stats {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+  }
+  .mock-stat-val { font-size: 20px; font-weight: 800; color: var(--cyan); }
+  .mock-stat-label { font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .mock-features {
+    padding: 24px 20px;
+    background: var(--bg2);
+    border-top: 1px solid var(--glass-border);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .mock-feature-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 12px;
+    transition: border-color 0.2s;
+  }
+  .mock-feature-icon { font-size: 18px; margin-bottom: 6px; }
+  .mock-feature-title { font-size: 9px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .mock-feature-desc { font-size: 8px; color: var(--text-dim); line-height: 1.5; }
+
+  /* ===== AUTH MOCKUP ===== */
+  .auth-mock {
+    display: flex;
+    height: 260px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+  }
+  .auth-left {
+    flex: 1;
+    background: var(--bg);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .auth-left-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(6,182,212,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(6,182,212,0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .auth-left-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(6,182,212,0.12) 0%, transparent 70%);
+  }
+  .auth-brand {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  .auth-brand-name { color: var(--cyan); font-weight: 800; font-size: 18px; text-shadow: 0 0 20px rgba(6,182,212,0.5); }
+  .auth-brand-sub { color: var(--text-dim); font-size: 10px; margin-top: 6px; line-height: 1.5; }
+
+  .auth-right {
+    width: 240px;
+    background: rgba(3,13,26,0.95);
+    border-left: 1px solid var(--glass-border);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .auth-title { color: var(--text); font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .auth-sub { color: var(--text-dim); font-size: 9px; margin-bottom: 16px; }
+  .auth-field { margin-bottom: 10px; }
+  .auth-label { color: var(--text-dim); font-size: 8px; font-weight: 600; margin-bottom: 3px; }
+  .auth-input {
+    width: 100%;
+    background: rgba(6,182,212,0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--text);
+    font-size: 9px;
+    box-sizing: border-box;
+  }
+  .auth-input:focus { border-color: var(--cyan); outline: none; }
+  .auth-btn {
+    width: 100%;
+    background: var(--cyan);
+    color: var(--bg);
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    margin-top: 4px;
+    cursor: pointer;
+  }
+  .auth-link { color: var(--text-dim); font-size: 8px; text-align: center; margin-top: 10px; }
+  .auth-link a { color: var(--cyan); }
+
+  /* ===== DASHBOARD MOCKUP ===== */
+  .dash-mock {
+    display: flex;
+    height: 280px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+  }
+  .dash-sidebar {
+    width: 140px;
+    background: rgba(2,11,20,0.98);
+    border-right: 1px solid var(--glass-border);
+    padding: 16px 10px;
+    flex-shrink: 0;
+  }
+  .dash-sidebar-logo { color: var(--cyan); font-weight: 800; font-size: 11px; padding: 0 6px 14px; border-bottom: 1px solid var(--glass-border); margin-bottom: 10px; }
+  .dash-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: 7px;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 2px;
+  }
+  .dash-nav-item.active {
+    background: rgba(6,182,212,0.1);
+    border: 1px solid rgba(6,182,212,0.2);
+    color: var(--cyan);
+  }
+  .dash-main {
+    flex: 1;
+    background: var(--bg2);
+    padding: 20px;
+    overflow: hidden;
+  }
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .dash-title { color: var(--text); font-weight: 700; font-size: 15px; }
+  .dash-week-nav {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .dash-week-btn {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 9px;
+  }
+  .dash-week-label { color: var(--text-dim); font-size: 9px; }
+  .dash-booking {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .dash-booking-time { color: var(--text); font-size: 10px; font-weight: 600; }
+  .dash-booking-id { color: var(--text-dim); font-size: 8px; margin-top: 2px; }
+  .dash-status-confirmed { color: #34d399; font-size: 8px; font-weight: 700; }
+  .dash-action-btn {
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-size: 8px;
+    font-weight: 600;
+    border: 1px solid;
+  }
+  .dash-btn-complete { background: rgba(52,211,153,0.1); color: #34d399; border-color: rgba(52,211,153,0.3); }
+  .dash-btn-cancel { background: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.3); margin-left: 4px; }
+
+  /* Highlights */
+  .highlight-box {
+    border: 2px solid var(--cyan);
+    border-radius: 8px;
+    padding: 12px 16px;
+    background: rgba(6,182,212,0.05);
+    margin-top: 20px;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .highlight-box strong { color: var(--text); }
+</style>
+
+<h2>Diseño Completo — Cyber Grid + Framer Motion</h2>
+<p class="subtitle">Mockups de las 3 zonas: Landing · Auth · Dashboard. Revisa y confirma antes de implementar.</p>
+
+<!-- LANDING -->
+<div class="zone-label">① Landing Page (marketing)</div>
+<div class="landing-mock">
+  <div class="mock-navbar">
+    <div class="mock-logo">⚡ Cliente Fiel</div>
+    <div class="mock-nav-links">
+      <span class="mock-nav-link">Precios</span>
+      <span class="mock-nav-link">Iniciar sesión</span>
+      <span class="mock-nav-cta">Prueba gratis</span>
+    </div>
+  </div>
+  <div class="mock-hero">
+    <div class="mock-hero-bg"></div>
+    <div class="mock-hero-glow"></div>
+    <div class="mock-hero-glow2"></div>
+    <div class="mock-badge">✅ Tus clientes ya tienen WhatsApp — úsalo</div>
+    <div class="mock-h1">Reservas y recordatorios<br><span>automáticos</span> por WhatsApp</div>
+    <div class="mock-p">Cliente Fiel automatiza tu WhatsApp Business. Tus clientes reservan, reciben recordatorios y vuelven solos.</div>
+    <div class="mock-ctas">
+      <div class="mock-cta-primary">Prueba gratis 14 días →</div>
+      <div class="mock-cta-secondary">Ver planes</div>
+    </div>
+    <div class="mock-stats">
+      <div><div class="mock-stat-val">-60%</div><div class="mock-stat-label">Menos ausencias</div></div>
+      <div><div class="mock-stat-val">2x</div><div class="mock-stat-label">Más retorno</div></div>
+      <div><div class="mock-stat-val">5 min</div><div class="mock-stat-label">Para configurar</div></div>
+    </div>
+  </div>
+  <div class="mock-features">
+    <div class="mock-feature-card">
+      <div class="mock-feature-icon">📅</div>
+      <div class="mock-feature-title">Reservas por WA</div>
+      <div class="mock-feature-desc">Tus clientes reservan con un mensaje. Sin apps.</div>
+    </div>
+    <div class="mock-feature-card">
+      <div class="mock-feature-icon">⏰</div>
+      <div class="mock-feature-title">Recordatorios auto</div>
+      <div class="mock-feature-desc">24h y 1h antes. Reduce ausencias 60%.</div>
+    </div>
+    <div class="mock-feature-card">
+      <div class="mock-feature-icon">🔄</div>
+      <div class="mock-feature-title">Clientes que vuelven</div>
+      <div class="mock-feature-desc">Recompra post-visita. 2x retorno.</div>
+    </div>
+    <div class="mock-feature-card">
+      <div class="mock-feature-icon">📊</div>
+      <div class="mock-feature-title">Panel de control</div>
+      <div class="mock-feature-desc">Agenda, historial, métricas.</div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="zone-label">② Auth Pages (login + registro)</div>
+<div class="auth-mock">
+  <div class="auth-left">
+    <div class="auth-left-grid"></div>
+    <div class="auth-left-glow"></div>
+    <div class="auth-brand">
+      <div class="auth-brand-name">⚡ Cliente Fiel</div>
+      <div class="auth-brand-sub">Automatiza tu WhatsApp Business.<br>Sin apps, sin complicaciones.</div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-title">Iniciar sesión</div>
+    <div class="auth-sub">Bienvenido de vuelta</div>
+    <div class="auth-field">
+      <div class="auth-label">EMAIL</div>
+      <input class="auth-input" placeholder="tu@negocio.cl" disabled />
+    </div>
+    <div class="auth-field">
+      <div class="auth-label">CONTRASEÑA</div>
+      <input class="auth-input" placeholder="••••••••" type="password" disabled />
+    </div>
+    <button class="auth-btn">Iniciar sesión</button>
+    <div class="auth-link">¿No tienes cuenta? <a href="#">Prueba gratis 14 días</a></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="zone-label">③ Dashboard (agenda + páginas internas)</div>
+<div class="dash-mock">
+  <div class="dash-sidebar">
+    <div class="dash-sidebar-logo">⚡ CF</div>
+    <div class="dash-nav-item active">📅 Agenda</div>
+    <div class="dash-nav-item">👥 Clientes</div>
+    <div class="dash-nav-item">💬 WhatsApp</div>
+    <div class="dash-nav-item">⚙️ Config</div>
+    <div class="dash-nav-item">📋 Logs</div>
+  </div>
+  <div class="dash-main">
+    <div class="dash-header">
+      <div class="dash-title">Agenda</div>
+      <div class="dash-week-nav">
+        <div class="dash-week-btn">← Anterior</div>
+        <div class="dash-week-label">31 mar – 6 abr 2026</div>
+        <div class="dash-week-btn">Siguiente →</div>
+      </div>
+    </div>
+    <div class="dash-booking">
+      <div>
+        <div class="dash-booking-time">Lunes 1 de abril, 10:00</div>
+        <div class="dash-booking-id">ID: a1b2c3d4... · <span class="dash-status-confirmed">confirmed</span></div>
+      </div>
+      <div>
+        <span class="dash-action-btn dash-btn-complete">Completar</span>
+        <span class="dash-action-btn dash-btn-cancel">Cancelar</span>
+      </div>
+    </div>
+    <div class="dash-booking">
+      <div>
+        <div class="dash-booking-time">Martes 2 de abril, 14:30</div>
+        <div class="dash-booking-id">ID: e5f6g7h8... · <span class="dash-status-confirmed">confirmed</span></div>
+      </div>
+      <div>
+        <span class="dash-action-btn dash-btn-complete">Completar</span>
+        <span class="dash-action-btn dash-btn-cancel">Cancelar</span>
+      </div>
+    </div>
+    <div class="dash-booking" style="opacity:0.5">
+      <div>
+        <div class="dash-booking-time">Miércoles 3 de abril, 09:00</div>
+        <div class="dash-booking-id">ID: i9j0k1l2... · <span style="color:#94a3b8;font-size:8px;font-weight:700">completed</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="highlight-box">
+  <strong>Animaciones Framer Motion incluidas:</strong> Hero fadeInUp (0.6s) · Stats counter animado (CountUp) · Feature cards stagger + glow on hover · Pricing cards scale on hover · FAQ accordion animado · Auth card entrada slide-up · Scroll reveal en todas las secciones
+</div>

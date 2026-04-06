@@ -1,4 +1,3 @@
-import pytest
 from app.models.availability import AvailabilityRule, AvailabilityOverride
 from app.models.booking import Booking
 
