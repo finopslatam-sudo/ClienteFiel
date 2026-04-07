@@ -34,6 +34,7 @@ async def create_service(
     service = Service(
         tenant_id=current_tenant.id,
         name=payload.name,
+        description=payload.description,
         duration_minutes=payload.duration_minutes,
         price=payload.price,
     )
@@ -58,6 +59,7 @@ async def update_service(
     if not service:
         raise HTTPException(status_code=404, detail="Service not found")
     service.name = payload.name
+    service.description = payload.description
     service.duration_minutes = payload.duration_minutes
     service.price = payload.price
     await db.commit()

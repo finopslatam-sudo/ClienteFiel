@@ -14,6 +14,8 @@ from app.api import dashboard as dashboard_router
 from app.api import logs as logs_router
 from app.api import availability as availability_router
 from app.api import public as public_router
+from app.api import tenant as tenant_router
+from app.api import customers as customers_router
 
 app = FastAPI(
     title="Cliente Fiel API",
@@ -42,6 +44,8 @@ app.include_router(logs_router.router, prefix="/api/v1")
 app.include_router(webhooks_router.router, prefix="/api")
 app.include_router(availability_router.router, prefix="/api/v1")
 app.include_router(public_router.router, prefix="/api/v1")
+app.include_router(tenant_router.router, prefix="/api/v1")
+app.include_router(customers_router.router, prefix="/api/v1")
 
 
 @app.get("/health")

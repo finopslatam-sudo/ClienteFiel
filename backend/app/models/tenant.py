@@ -36,5 +36,6 @@ class Tenant(Base, TimestampMixin):
         SAEnum(TenantStatus), default=TenantStatus.trial, nullable=False
     )
     trial_ends_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    timezone: Mapped[str] = mapped_column(String(60), default="America/Santiago", nullable=False)
 
     users: Mapped[list["User"]] = relationship("User", back_populates="tenant")  # noqa: F821
