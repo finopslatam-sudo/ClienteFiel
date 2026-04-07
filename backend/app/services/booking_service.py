@@ -5,6 +5,7 @@ from sqlalchemy import select, text
 from app.models.booking import Booking, BookingStatus, BookingCreatedBy
 from app.models.customer import Customer, CustomerStatus
 from app.models.service import Service
+from app.tasks.reminders import send_booking_confirmation, send_reminder_24h, send_reminder_1h
 
 
 class BookingService:
@@ -92,6 +93,20 @@ class BookingService:
         customer.last_booking_at = datetime.now(timezone.utc).replace(tzinfo=None)
         await self.db.commit()
         await self.db.refresh(booking)
+
+        # Disparar tareas Celery después del commit (booking ya persistido)
+        booking_id_str = str(booking.id)
+        send_booking_confirmation.delay(booking_id_str)
+
+        dt_24h = scheduled_at - timedelta(hours=24)
+        dt_1h = scheduled_at - timedelta(hours=1)
+        now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+
+        if dt_24h > now_utc:
+            send_reminder_24h.apply_async(args=[booking_id_str], eta=dt_24h)
+        if dt_1h > now_utc:
+            send_reminder_1h.apply_async(args=[booking_id_str], eta=dt_1h)
+
         return booking
 
     async def get_booking(self, tenant_id: uuid.UUID, booking_id: uuid.UUID) -> Booking | None:
