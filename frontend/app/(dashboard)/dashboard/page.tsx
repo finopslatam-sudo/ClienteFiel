@@ -2,11 +2,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { getAuthHeaders } from '@/lib/auth'
 import { motion } from 'framer-motion'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
-
-const API = process.env.NEXT_PUBLIC_API_URL
+import api from '@/lib/api'
 
 interface Summary {
   bookings_today: number
@@ -27,23 +25,13 @@ interface UpcomingBooking {
 }
 
 async function fetchSummary(): Promise<Summary> {
-  const res = await fetch(`${API}/api/v1/dashboard/summary`, { headers: await getAuthHeaders() })
-  if (!res.ok) throw new Error('Error cargando resumen')
-  return res.json()
+  const { data } = await api.get<Summary>('/api/v1/dashboard/summary')
+  return data
 }
 
 async function fetchUpcoming(): Promise<{ bookings: UpcomingBooking[] }> {
-  const res = await fetch(`${API}/api/v1/dashboard/upcoming?limit=8`, { headers: await getAuthHeaders() })
-  if (!res.ok) throw new Error('Error cargando próximas reservas')
-  return res.json()
-}
-
-const statusLabel: Record<string, string> = {
-  confirmed: 'Confirmada',
-  pending: 'Pendiente',
-  completed: 'Completada',
-  canceled: 'Cancelada',
-  no_show: 'No asistió',
+  const { data } = await api.get<{ bookings: UpcomingBooking[] }>('/api/v1/dashboard/upcoming', { params: { limit: 8 } })
+  return data
 }
 
 const statusColor: Record<string, string> = {
