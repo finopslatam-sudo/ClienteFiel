@@ -7,7 +7,8 @@ import { staggerContainer, fadeInUp } from '@/lib/motion'
 const plans = [
   {
     name: 'Básico',
-    price: '$29',
+    priceCLP: '$20.000',
+    priceUSD: 'USD 22',
     subtitle: 'Agenda Automatizada',
     features: [
       'Reservas vía WhatsApp',
@@ -21,7 +22,8 @@ const plans = [
   },
   {
     name: 'Medio',
-    price: '$59',
+    priceCLP: '$40.000',
+    priceUSD: 'USD 42',
     subtitle: 'Recompra Inteligente',
     features: [
       'Todo el Plan Básico',
@@ -35,7 +37,8 @@ const plans = [
   },
   {
     name: 'Premium',
-    price: '$99',
+    priceCLP: '$60.000',
+    priceUSD: 'USD 62',
     subtitle: 'Fidelización + Retención',
     features: [
       'Todo el Plan Medio',
@@ -100,8 +103,11 @@ export function Pricing() {
                 </span>
               )}
               <div className="text-4xl font-bold" style={{ color: '#f1f5f9' }}>
-                {plan.price}
-                <span className="text-base font-normal" style={{ color: '#94a3b8' }}> USD/mes</span>
+                {plan.priceCLP}
+                <span className="text-base font-normal" style={{ color: '#94a3b8' }}> CLP/mes</span>
+              </div>
+              <div className="text-sm mt-0.5" style={{ color: '#64748b' }}>
+                {plan.priceUSD}/mes
               </div>
               <div className="font-semibold mt-1" style={{ color: '#f1f5f9' }}>{plan.name}</div>
               <div className="text-sm mb-6" style={{ color: '#94a3b8' }}>{plan.subtitle}</div>
