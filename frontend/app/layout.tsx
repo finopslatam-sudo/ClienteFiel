@@ -10,10 +10,6 @@ export const metadata: Metadata = {
   description:
     'Automatiza tus reservas, recordatorios y fidelización de clientes por WhatsApp. Sin apps, sin complicaciones. Prueba gratis 14 días.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://clientefiel.cl'),
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-  },
   openGraph: {
     type: 'website',
     title: 'Cliente Fiel — Reservas y Fidelización por WhatsApp',
@@ -25,9 +21,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className="dark">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-      </head>
       <body className={inter.className}>
         <Providers>{children}</Providers>
       </body>
