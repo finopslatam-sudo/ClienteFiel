@@ -19,6 +19,7 @@ class BookingStatus(str, enum.Enum):
 class BookingCreatedBy(str, enum.Enum):
     whatsapp = "whatsapp"
     admin = "admin"
+    customer = "customer"
 
 
 class Booking(Base, TimestampMixin):

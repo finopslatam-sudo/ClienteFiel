@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { logout } from '@/lib/auth'
 
 const navItems = [
+  { href: '/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/agenda', label: 'Agenda', icon: '📅' },
   { href: '/clientes', label: 'Clientes', icon: '👥' },
   { href: '/configuracion', label: 'Configuración', icon: '⚙️' },
