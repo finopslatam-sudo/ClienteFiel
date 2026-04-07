@@ -95,31 +95,40 @@ export function WeeklySchedule() {
   return (
     <div className="space-y-3">
       <p className="text-sm mb-4" style={{ color: '#94a3b8' }}>
-        Configura los días y horarios en que recibirás reservas. El timezone es America/Santiago.
+        Configura los días y horarios en que recibirás reservas. Timezone: America/Santiago.
       </p>
+
+      {/* Column headers */}
+      <div className="hidden sm:grid px-4" style={{ gridTemplateColumns: '160px 1fr 1fr 1fr' }}>
+        <span />
+        <span className="text-xs font-medium" style={{ color: '#64748b' }}>Horario</span>
+        <span className="text-xs font-medium" style={{ color: '#64748b' }}>Duración del servicio</span>
+        <span className="text-xs font-medium" style={{ color: '#64748b' }}>Tiempo entre citas</span>
+      </div>
 
       {days.map((day, i) => (
         <div
           key={i}
           className="glass-card p-4"
-          style={{ opacity: day.enabled ? 1 : 0.5, transition: 'opacity 0.2s' }}
+          style={{ opacity: day.enabled ? 1 : 0.6, transition: 'opacity 0.2s' }}
         >
-          <div className="flex items-center gap-4 flex-wrap">
+          {/* Desktop: grid row */}
+          <div className="hidden sm:grid items-center gap-4" style={{ gridTemplateColumns: '160px 1fr 1fr 1fr' }}>
             {/* Toggle + day name */}
-            <div className="flex items-center gap-3 w-28">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => updateDay(i, { enabled: !day.enabled })}
-                className="w-10 h-5 rounded-full relative transition-colors"
+                className="flex-shrink-0 w-11 h-6 rounded-full relative overflow-hidden transition-colors"
                 style={{
                   background: day.enabled ? 'rgba(6,182,212,0.8)' : 'rgba(100,116,139,0.3)',
                 }}
               >
                 <span
-                  className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform"
-                  style={{ transform: day.enabled ? 'translateX(22px)' : 'translateX(2px)' }}
+                  className="absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform"
+                  style={{ transform: day.enabled ? 'translateX(18px)' : 'translateX(0px)' }}
                 />
               </button>
-              <span className="text-sm font-medium" style={{ color: '#f1f5f9' }}>
+              <span className="text-sm font-medium whitespace-nowrap" style={{ color: '#f1f5f9' }}>
                 {DAY_NAMES[i]}
               </span>
             </div>
@@ -131,7 +140,7 @@ export function WeeklySchedule() {
                 value={day.start_time}
                 disabled={!day.enabled}
                 onChange={e => updateDay(i, { start_time: e.target.value })}
-                className="text-sm px-2 py-1 rounded-lg"
+                className="text-sm px-2 py-1 rounded-lg w-full max-w-[110px]"
                 style={{
                   background: 'rgba(15,23,42,0.6)',
                   border: '1px solid rgba(6,182,212,0.15)',
@@ -144,7 +153,7 @@ export function WeeklySchedule() {
                 value={day.end_time}
                 disabled={!day.enabled}
                 onChange={e => updateDay(i, { end_time: e.target.value })}
-                className="text-sm px-2 py-1 rounded-lg"
+                className="text-sm px-2 py-1 rounded-lg w-full max-w-[110px]"
                 style={{
                   background: 'rgba(15,23,42,0.6)',
                   border: '1px solid rgba(6,182,212,0.15)',
@@ -154,44 +163,89 @@ export function WeeklySchedule() {
             </div>
 
             {/* Slot duration */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs" style={{ color: '#94a3b8' }}>Duración del servicio</span>
-              <select
-                value={day.slot_duration_minutes}
-                disabled={!day.enabled}
-                onChange={e => updateDay(i, { slot_duration_minutes: Number(e.target.value) })}
-                className="text-sm px-2 py-1 rounded-lg"
-                style={{
-                  background: 'rgba(15,23,42,0.6)',
-                  border: '1px solid rgba(6,182,212,0.15)',
-                  color: '#f1f5f9',
-                }}
-              >
-                {SLOT_OPTIONS.map(({ value, label }) => (
-                  <option key={value} value={value}>{label}</option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={day.slot_duration_minutes}
+              disabled={!day.enabled}
+              onChange={e => updateDay(i, { slot_duration_minutes: Number(e.target.value) })}
+              className="text-sm px-2 py-1 rounded-lg w-full max-w-[160px]"
+              style={{
+                background: 'rgba(15,23,42,0.6)',
+                border: '1px solid rgba(6,182,212,0.15)',
+                color: '#f1f5f9',
+              }}
+            >
+              {SLOT_OPTIONS.map(({ value, label }) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
 
             {/* Buffer */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs" style={{ color: '#94a3b8' }}>Tiempo entre citas</span>
-              <select
-                value={day.buffer_minutes}
-                disabled={!day.enabled}
-                onChange={e => updateDay(i, { buffer_minutes: Number(e.target.value) })}
-                className="text-sm px-2 py-1 rounded-lg"
+            <select
+              value={day.buffer_minutes}
+              disabled={!day.enabled}
+              onChange={e => updateDay(i, { buffer_minutes: Number(e.target.value) })}
+              className="text-sm px-2 py-1 rounded-lg w-full max-w-[140px]"
+              style={{
+                background: 'rgba(15,23,42,0.6)',
+                border: '1px solid rgba(6,182,212,0.15)',
+                color: '#f1f5f9',
+              }}
+            >
+              {BUFFER_OPTIONS.map(v => (
+                <option key={v} value={v}>{v === 0 ? 'Sin pausa' : `${v} min`}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Mobile: stacked layout */}
+          <div className="flex flex-col gap-3 sm:hidden">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => updateDay(i, { enabled: !day.enabled })}
+                className="flex-shrink-0 w-11 h-6 rounded-full relative overflow-hidden transition-colors"
                 style={{
-                  background: 'rgba(15,23,42,0.6)',
-                  border: '1px solid rgba(6,182,212,0.15)',
-                  color: '#f1f5f9',
+                  background: day.enabled ? 'rgba(6,182,212,0.8)' : 'rgba(100,116,139,0.3)',
                 }}
               >
-                {BUFFER_OPTIONS.map(v => (
-                  <option key={v} value={v}>{v === 0 ? 'Sin pausa' : `${v} min`}</option>
-                ))}
-              </select>
+                <span
+                  className="absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform"
+                  style={{ transform: day.enabled ? 'translateX(18px)' : 'translateX(0px)' }}
+                />
+              </button>
+              <span className="text-sm font-medium" style={{ color: '#f1f5f9' }}>{DAY_NAMES[i]}</span>
             </div>
+            {day.enabled && (
+              <div className="flex flex-col gap-2 pl-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs w-24" style={{ color: '#64748b' }}>Horario</span>
+                  <div className="flex items-center gap-2">
+                    <input type="time" value={day.start_time} onChange={e => updateDay(i, { start_time: e.target.value })}
+                      className="text-sm px-2 py-1 rounded-lg"
+                      style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(6,182,212,0.15)', color: '#f1f5f9' }} />
+                    <span style={{ color: '#94a3b8' }}>–</span>
+                    <input type="time" value={day.end_time} onChange={e => updateDay(i, { end_time: e.target.value })}
+                      className="text-sm px-2 py-1 rounded-lg"
+                      style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(6,182,212,0.15)', color: '#f1f5f9' }} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs w-24" style={{ color: '#64748b' }}>Duración</span>
+                  <select value={day.slot_duration_minutes} onChange={e => updateDay(i, { slot_duration_minutes: Number(e.target.value) })}
+                    className="text-sm px-2 py-1 rounded-lg"
+                    style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(6,182,212,0.15)', color: '#f1f5f9' }}>
+                    {SLOT_OPTIONS.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs w-24" style={{ color: '#64748b' }}>Entre citas</span>
+                  <select value={day.buffer_minutes} onChange={e => updateDay(i, { buffer_minutes: Number(e.target.value) })}
+                    className="text-sm px-2 py-1 rounded-lg"
+                    style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(6,182,212,0.15)', color: '#f1f5f9' }}>
+                    {BUFFER_OPTIONS.map(v => <option key={v} value={v}>{v === 0 ? 'Sin pausa' : `${v} min`}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ))}
