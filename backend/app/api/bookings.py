@@ -1,6 +1,6 @@
 import uuid
 from typing import Annotated
-from datetime import datetime, timedelta
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
@@ -9,7 +9,6 @@ from app.models.tenant import Tenant
 from app.models.booking import BookingStatus, BookingCreatedBy
 from app.services.booking_service import BookingService
 from app.schemas.booking import BookingCreateRequest, BookingResponse, BookingListResponse
-from app.tasks.reminders import send_booking_confirmation, send_reminder_24h, send_reminder_1h
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
@@ -32,15 +31,6 @@ async def create_booking(
         )
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
-
-    try:
-        send_booking_confirmation.delay(str(booking.id))
-        dt_24h = booking.scheduled_at - timedelta(hours=24)
-        dt_1h = booking.scheduled_at - timedelta(hours=1)
-        send_reminder_24h.apply_async(args=[str(booking.id)], eta=dt_24h)
-        send_reminder_1h.apply_async(args=[str(booking.id)], eta=dt_1h)
-    except Exception:
-        pass  # Celery broker may not be available
 
     return BookingResponse.model_validate(booking)
 
