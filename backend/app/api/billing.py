@@ -43,6 +43,7 @@ async def subscribe(
             tenant_id=current_tenant.id,
             plan=payload.plan,
             back_url=payload.back_url,
+            payer_email=current_user.email,
         )
     except ValueError as e:
         raise HTTPException(status_code=502, detail=str(e))

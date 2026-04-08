@@ -87,6 +87,7 @@ async def test_create_mp_subscription_success(db_session: AsyncSession, tenant):
             tenant_id=tenant.id,
             plan=TenantPlan.basic,
             back_url="https://clientefiel.riava.cl/dashboard",
+            payer_email="test@example.com",
         )
 
     assert "mercadopago" in url or "checkout" in url
