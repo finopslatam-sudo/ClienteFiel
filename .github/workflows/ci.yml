@@ -68,11 +68,7 @@ jobs:
           META_APP_SECRET: test-app-secret
           META_WEBHOOK_VERIFY_TOKEN: test-verify-token
           ENCRYPTION_KEY: AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=
-          STRIPE_SECRET_KEY: sk_test_placeholder
-          STRIPE_WEBHOOK_SECRET: whsec_test_placeholder
-          STRIPE_BASIC_PRICE_ID: price_test_basic
-          STRIPE_MEDIUM_PRICE_ID: price_test_medium
-          STRIPE_PREMIUM_PRICE_ID: price_test_premium
+          MP_ACCESS_TOKEN: TEST-placeholder-mp-access-token
           CELERY_BROKER_URL: redis://localhost:6379/0
           CELERY_RESULT_BACKEND: redis://localhost:6379/0
         run: |
@@ -111,5 +107,5 @@ jobs:
           NEXT_PUBLIC_META_APP_ID: placeholder
           NEXT_PUBLIC_META_SIGNUP_CONFIG_ID: placeholder
           NEXT_PUBLIC_SITE_URL: https://placeholder.vercel.app
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+          NEXT_PUBLIC_MP_PUBLIC_KEY: TEST-placeholder-mp-public-key
         run: npm run build
