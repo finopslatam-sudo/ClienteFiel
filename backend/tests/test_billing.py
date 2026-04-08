@@ -1,5 +1,4 @@
 # backend/tests/test_billing.py
-import uuid
 import pytest
 from unittest.mock import MagicMock, patch
 from httpx import AsyncClient
@@ -7,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.services.billing_service import BillingService, PLAN_PRICES_CLP
 from app.models.tenant import TenantPlan, TenantStatus
-from app.models.subscription import Subscription, PaymentProvider
+from app.models.subscription import PaymentProvider
 from tests.conftest import register_and_login
 
 
