@@ -1,10 +1,11 @@
 # backend/app/api/auth.py
 from datetime import timedelta
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from app.core.database import get_db
-from app.core.security import create_access_token
+from app.core.security import create_access_token, decode_access_token
 from app.core.dependencies import get_current_user
 from app.core.config import settings
 from app.core.rate_limit import limiter
@@ -86,6 +87,49 @@ async def login(
         domain=settings.cookie_domain or None,
     )
     return TokenResponse(access_token=access_token)
+
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh(
+    response: Response,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    refresh_token: str | None = Cookie(default=None),
+):
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="No refresh token")
+    try:
+        payload = decode_access_token(refresh_token)
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+    if payload.get("type") != "refresh":
+        raise HTTPException(status_code=401, detail="Invalid token type")
+
+    user_id = payload.get("sub")
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user or not user.is_active:
+        raise HTTPException(status_code=401, detail="User not found")
+
+    new_access_token = create_access_token({
+        "sub": str(user.id),
+        "tenant_id": str(user.tenant_id),
+        "role": user.role.value,
+    })
+    # Rotar refresh token
+    new_refresh_token = create_access_token(
+        {"sub": str(user.id), "type": "refresh"},
+        expires_delta=timedelta(days=settings.jwt_refresh_token_expire_days),
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=new_refresh_token,
+        httponly=True,
+        secure=settings.environment != "development",
+        samesite="lax",
+        max_age=settings.jwt_refresh_token_expire_days * 24 * 3600,
+        domain=settings.cookie_domain or None,
+    )
+    return TokenResponse(access_token=new_access_token)
 
 
 @router.post("/logout")
