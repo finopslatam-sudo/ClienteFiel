@@ -68,7 +68,7 @@ export function Pricing() {
             Planes simples, sin sorpresas
           </motion.h2>
           <motion.p variants={fadeInUp} className="mt-3 text-lg" style={{ color: '#94a3b8' }}>
-            14 días gratis · Sin tarjeta · Cancela cuando quieras
+            14 días gratis · Suscripción mensual con tarjeta · Cancela cuando quieras
           </motion.p>
         </motion.div>
 

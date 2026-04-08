@@ -20,7 +20,7 @@ export default function PreciosPage() {
           Precios
         </h1>
         <p className="mt-3 text-lg" style={{ color: '#94a3b8' }}>
-          Sin contratos. Sin sorpresas. Cancela cuando quieras.
+          Suscripción mensual con tarjeta · Sin contratos · Cancela cuando quieras
         </p>
       </div>
       <Pricing />
