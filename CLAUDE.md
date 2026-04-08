@@ -123,11 +123,13 @@ const securityHeaders = [
 - Backend: `.env` en `/var/www/clientefiel/backend/.env` en el servidor Hetzner
 - Frontend: `.env.local` (Vercel env vars en producción)
 - `NEXT_PUBLIC_` solo para datos no sensibles (URL del API, Meta App ID público)
-- ❌ Nunca: JWT secret, WhatsApp tokens, Stripe secret en frontend
+- ❌ Nunca: JWT secret, WhatsApp tokens, claves secretas de pasarelas de pago en frontend
 
 ### Validación de webhooks:
 - Meta: validar `X-Hub-Signature-256` en CADA request
-- Stripe: `stripe.webhooks.construct_event` con `STRIPE_WEBHOOK_SECRET`
+- PayPal: validar webhook signature con `PAYPAL_WEBHOOK_ID`
+- Mercado Pago: validar `x-signature` header con `MP_WEBHOOK_SECRET`
+- Webpay: usar SDK oficial de Transbank — nunca raw HTTP sin validación
 
 ---
 
@@ -136,7 +138,7 @@ const securityHeaders = [
 - Rate limiting: `slowapi` + Redis (por IP y por tenant)
 - CORS: solo `FRONTEND_URL` permitido en producción
 - SQL: solo SQLAlchemy ORM — nunca raw SQL con input de usuario
-- SSRF: solo llamadas permitidas a `graph.facebook.com` y `api.stripe.com`
+- SSRF: solo llamadas permitidas a `graph.facebook.com`, `api.paypal.com`, `api.mercadopago.com` y dominios Transbank
 - HTTPS: obligatorio en todos los entornos (Vercel + reverse proxy backend)
 
 ---
@@ -202,12 +204,20 @@ POST /api/webhooks/whatsapp
 
 ---
 
-## 💳 PAGOS — STRIPE
+## 💳 PAGOS — SUSCRIPCIONES RECURRENTES
 
-- ✅ Validar webhook signature en cada evento
-- ✅ Estado de suscripción: siempre actualizado via webhook, nunca via redirect
-- ✅ Idempotency keys en llamadas a Stripe API
+**Proveedores oficiales (ningún otro está permitido):**
+- **PayPal** — suscripciones recurrentes via Billing Agreements / Subscriptions API
+- **Mercado Pago** — suscripciones recurrentes via Preapproval API (Chile)
+- **Webpay Plus (Transbank)** — pagos con tarjeta chilena via SDK oficial de Transbank
+
+### Reglas:
+- ✅ Validar webhook/notificación signature en CADA evento de los tres proveedores
+- ✅ Estado de suscripción: siempre actualizado via webhook/IPN, nunca via redirect
+- ✅ Idempotency keys en llamadas a APIs de pago
+- ✅ Usar SDK oficial de cada proveedor — nunca HTTP raw sin validación
 - ❌ No almacenar datos de tarjeta
+- ❌ Stripe no es parte del proyecto — no importar ni mencionar en código
 
 ---
 
@@ -328,4 +338,4 @@ test: agregar test de aislamiento multi-tenant
 
 > Si compromete seguridad, aislamiento de tenants, o la integridad de las credenciales WhatsApp de los clientes — está prohibido.
 
-*Última actualización: 2026-04-02*
+*Última actualización: 2026-04-08*

@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     celery_broker_url: str
     celery_result_backend: str
     cookie_domain: str = ""
+    mp_access_token: str = ""
+    mp_webhook_secret: str = ""
 
     model_config = {"env_file": ".env"}
 

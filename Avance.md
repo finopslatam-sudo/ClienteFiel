@@ -74,7 +74,7 @@ Motor automatiza envíos usando SUS credenciales:
 | Cache / Broker | Redis 7 | Rate limiting, sesiones, Celery broker |
 | Jobs / Cron | Celery + Celery Beat | Recordatorios y campañas programadas |
 | Auth | python-jose (JWT) + Passlib (bcrypt) | Estándar seguro |
-| Pagos | Stripe SDK | Suscripciones, webhooks |
+| Pagos | PayPal SDK + Mercado Pago SDK + Transbank SDK | Suscripciones recurrentes, webhooks |
 | WhatsApp | Meta Cloud API (credenciales del cliente) | Por tenant, sin cuenta central |
 | Cifrado tokens | cryptography (Fernet/AES-256) | Proteger credenciales WhatsApp |
 | Validación | Pydantic v2 | Input validation automático |
@@ -152,7 +152,7 @@ Motor automatiza envíos usando SUS credenciales:
 │  │          │ │API       │ │API        │ │ Config    │  │
 │  └──────────┘ └──────────┘ └───────────┘ └───────────┘  │
 │  ┌──────────┐ ┌──────────┐ ┌───────────┐                 │
-│  │Client API│ │Webhook   │ │ Stripe    │                 │
+│  │Client API│ │Webhook   │ │ Billing   │                 │
 │  └──────────┘ └──────────┘ └───────────┘                 │
 └──────────┬────────────────────────┬────────────────────-─┘
            │                        │
@@ -196,7 +196,7 @@ Motor automatiza envíos usando SUS credenciales:
 | `message_templates` | Templates configurados por tenant/plan |
 | `campaigns` | Campañas de recompra/fidelización |
 | `points_transactions` | Sistema de puntos (premium) |
-| `subscriptions` | Estado suscripción Stripe por tenant |
+| `subscriptions` | Estado suscripción por tenant (PayPal / Mercado Pago / Webpay) |
 
 ### Tabla crítica — whatsapp_connections:
 ```sql
@@ -216,11 +216,16 @@ CREATE TABLE whatsapp_connections (
 
 ---
 
-## 💳 PAGOS — STRIPE
+## 💳 PAGOS — SUSCRIPCIONES RECURRENTES
 
-- Suscripciones mensuales en USD por plan
-- Trial: 14 días sin requerir tarjeta
-- Webhook Stripe → actualiza estado en DB
+**Proveedores oficiales:**
+- **PayPal** — suscripciones recurrentes (Subscriptions API)
+- **Mercado Pago** — suscripciones recurrentes (Preapproval API, Chile)
+- **Webpay Plus (Transbank)** — pago con tarjeta chilena (SDK oficial)
+
+- Suscripciones mensuales en CLP/USD por plan
+- Trial: 14 días
+- Webhooks/IPN de cada proveedor → actualizan estado en DB
 - Portal de cliente para gestionar facturación
 - Estados: `trial` → `active` → `canceled` → `past_due`
 
@@ -258,7 +263,7 @@ Seguir `saas-frontend.md` para sistema visual completo.
 3. ✅ Conexión WhatsApp Business (manual: phone_number_id + token)
 4. ✅ Plan Básico: reservas + 3 recordatorios automáticos
 5. ✅ Dashboard: agenda semanal + lista de clientes
-6. ✅ Pago con Stripe (Plan Básico)
+6. ✅ Pago recurrente con PayPal / Mercado Pago / Webpay (Plan Básico)
 
 **Post-MVP:**
 - Plan Medio: mensajes de recompra
@@ -278,7 +283,7 @@ ClienteFiel/
 │   │   │   ├── bookings.py           # CRUD reservas
 │   │   │   ├── clients.py            # Gestión clientes finales
 │   │   │   ├── whatsapp.py           # Conectar/gestionar WA Business
-│   │   │   ├── webhooks.py           # Webhook Meta + Stripe
+│   │   │   ├── webhooks.py           # Webhook Meta + PayPal + Mercado Pago + Webpay
 │   │   │   ├── campaigns.py          # Campañas automáticas
 │   │   │   └── subscriptions.py      # Planes y facturación
 │   │   ├── core/

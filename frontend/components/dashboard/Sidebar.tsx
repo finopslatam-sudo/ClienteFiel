@@ -11,6 +11,7 @@ const navItems = [
   { href: '/configuracion', label: 'Configuración', icon: '⚙️' },
   { href: '/whatsapp', label: 'WhatsApp', icon: '💬' },
   { href: '/logs', label: 'Logs', icon: '📋' },
+  { href: '/suscripcion', label: 'Suscripción', icon: '💳' },
 ]
 
 export function Sidebar() {

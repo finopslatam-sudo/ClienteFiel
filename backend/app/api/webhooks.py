@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.redis_client import is_message_processed, mark_message_processed
 from app.models.whatsapp import WhatsappConnection
+from app.services.billing_service import BillingService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
@@ -91,5 +92,41 @@ async def receive_whatsapp_webhook(
                             "tenant_id": str(conn.tenant_id),
                             "meta_message_id": meta_message_id,
                         })
+
+    return Response(status_code=200)
+
+
+@router.post("/mercadopago")
+async def receive_mercadopago_webhook(
+    request: Request,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """
+    IPN de Mercado Pago para suscripciones recurrentes (Preapproval).
+    MP envía: {"type": "subscription_preapproval", "data": {"id": "..."}}
+    Siempre retornar 200 — MP reintenta si no recibe 200.
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return Response(status_code=200)
+
+    topic = body.get("type") or request.query_params.get("topic")
+    resource_id = (
+        body.get("data", {}).get("id")
+        or request.query_params.get("id")
+    )
+
+    if topic not in ("subscription_preapproval", "preapproval") or not resource_id:
+        return Response(status_code=200)
+
+    try:
+        service = BillingService(db)
+        await service.handle_mp_webhook(preapproval_id=resource_id)
+    except Exception:
+        logger.exception({
+            "event": "webhook.mp_processing_error",
+            "resource_id": resource_id,
+        })
 
     return Response(status_code=200)
