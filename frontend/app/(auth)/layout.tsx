@@ -14,10 +14,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="absolute top-4 left-4 z-10">
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors"
-          style={{ color: '#94a3b8' }}
-          onMouseOver={e => (e.currentTarget.style.color = '#f1f5f9')}
-          onMouseOut={e => (e.currentTarget.style.color = '#94a3b8')}
+          className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors text-slate-400 hover:text-slate-100"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
