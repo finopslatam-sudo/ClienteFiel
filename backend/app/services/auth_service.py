@@ -22,7 +22,7 @@ class AuthService:
         self, business_name: str, email: str, password: str,
         first_name: str = "", last_name: str = "",
     ) -> tuple[User, Tenant]:
-        # Verificar email único
+        # Email must be globally unique across all tenants (used as login credential)
         result = await self.db.execute(select(User).where(User.email == email))
         if result.scalar_one_or_none():
             raise ValueError("Email already registered")
