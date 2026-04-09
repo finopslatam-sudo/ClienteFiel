@@ -21,7 +21,7 @@ const jsonLd = {
   description:
     'Sistema de reservas y fidelización vía WhatsApp para pequeños negocios. Sin apps, sin complicaciones.',
   offers: [
-    { '@type': 'Offer', name: 'Plan Básico', price: '20000', priceCurrency: 'CLP' },
+    { '@type': 'Offer', name: 'Plan Básico', price: '1000', priceCurrency: 'CLP' },
     { '@type': 'Offer', name: 'Plan Medio', price: '40000', priceCurrency: 'CLP' },
     { '@type': 'Offer', name: 'Plan Premium', price: '60000', priceCurrency: 'CLP' },
   ],

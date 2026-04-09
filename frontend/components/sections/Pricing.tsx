@@ -7,8 +7,8 @@ import { staggerContainer, fadeInUp } from '@/lib/motion'
 const plans = [
   {
     name: 'Básico',
-    priceCLP: '$20.000',
-    priceUSD: 'USD 22',
+    priceCLP: '$1.000',
+    priceUSD: 'USD 1',
     subtitle: 'Agenda Automatizada',
     features: [
       'Reservas vía WhatsApp',

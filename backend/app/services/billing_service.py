@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 # Precios en CLP por plan (moneda local para Mercado Pago Chile)
 PLAN_PRICES_CLP: dict[TenantPlan, int] = {
-    TenantPlan.basic: 20000,
+    TenantPlan.basic: 1000,
     TenantPlan.medium: 40000,
     TenantPlan.premium: 60000,
 }
