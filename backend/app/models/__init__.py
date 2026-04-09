@@ -8,6 +8,7 @@ from app.models.booking import Booking, BookingStatus, BookingCreatedBy
 from app.models.reminder import Reminder, ReminderType, ReminderStatus
 from app.models.message_log import MessageLog, MessageLogType, MessageLogStatus
 from app.models.subscription import Subscription
+from app.models.billing_profile import BillingProfile, DocumentType
 
 __all__ = [
     "Tenant", "TenantPlan", "TenantStatus",
@@ -20,4 +21,5 @@ __all__ = [
     "Reminder", "ReminderType", "ReminderStatus",
     "MessageLog", "MessageLogType", "MessageLogStatus",
     "Subscription",
+    "BillingProfile", "DocumentType",
 ]
