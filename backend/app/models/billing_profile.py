@@ -45,4 +45,4 @@ class BillingProfile(Base, TimestampMixin):
     company_giro: Mapped[str | None] = mapped_column(String(255), nullable=True)
     company_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
-    tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="billing_profile")
+    tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="billing_profile")  # noqa: F821
