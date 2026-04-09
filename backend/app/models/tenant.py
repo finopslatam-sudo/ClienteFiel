@@ -39,6 +39,6 @@ class Tenant(Base, TimestampMixin):
     timezone: Mapped[str] = mapped_column(String(60), default="America/Santiago", nullable=False)
 
     users: Mapped[list["User"]] = relationship("User", back_populates="tenant")  # noqa: F821
-    billing_profile: Mapped["BillingProfile | None"] = relationship(
+    billing_profile: Mapped["BillingProfile | None"] = relationship(  # noqa: F821
         "BillingProfile", back_populates="tenant", uselist=False
     )
