@@ -1,4 +1,3 @@
-// frontend/app/(auth)/registro/page.tsx
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -11,6 +10,8 @@ import { register as registerUser } from '@/lib/auth'
 import { fadeInUp } from '@/lib/motion'
 
 const schema = z.object({
+  first_name: z.string().min(1, 'Nombre requerido'),
+  last_name: z.string().min(1, 'Apellido requerido'),
   business_name: z.string().min(2, 'Nombre del negocio requerido'),
   email: z.string().email('Email inválido'),
   password: z.string().min(8, 'Mínimo 8 caracteres'),
@@ -43,6 +44,35 @@ export default function RegisterPage() {
       <p className="text-sm mb-6" style={{ color: '#94a3b8' }}>14 días gratis · Sin tarjeta de crédito</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1" style={{ color: '#94a3b8' }}>
+              Nombre
+            </label>
+            <input
+              {...register('first_name')}
+              placeholder="Richard"
+              className="input-dark w-full px-3 py-2 text-sm"
+            />
+            {errors.first_name && (
+              <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.first_name.message}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1" style={{ color: '#94a3b8' }}>
+              Apellido
+            </label>
+            <input
+              {...register('last_name')}
+              placeholder="Chamorro"
+              className="input-dark w-full px-3 py-2 text-sm"
+            />
+            {errors.last_name && (
+              <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.last_name.message}</p>
+            )}
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: '#94a3b8' }}>
             Nombre del negocio

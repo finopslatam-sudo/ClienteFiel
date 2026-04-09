@@ -3,6 +3,8 @@ import api from '@/lib/api'
 import { useAuthStore, type AuthUser } from '@/store/auth'
 
 interface RegisterPayload {
+  first_name: string
+  last_name: string
   business_name: string
   email: string
   password: string
