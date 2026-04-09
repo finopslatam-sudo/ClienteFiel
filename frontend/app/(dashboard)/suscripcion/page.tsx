@@ -1,6 +1,7 @@
 // frontend/app/(dashboard)/suscripcion/page.tsx
 'use client'
 import { useState, useEffect } from 'react'
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/api'
 import { DocumentPreferenceModal } from '@/components/billing/DocumentPreferenceModal'
@@ -69,7 +70,7 @@ const plans = [
   },
 ]
 
-export default function SuscripcionPage() {
+function SuscripcionContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null)
@@ -260,5 +261,13 @@ export default function SuscripcionPage() {
 
       {showModal && <DocumentPreferenceModal onClose={handleModalClose} />}
     </div>
+  )
+}
+
+export default function SuscripcionPage() {
+  return (
+    <Suspense>
+      <SuscripcionContent />
+    </Suspense>
   )
 }
