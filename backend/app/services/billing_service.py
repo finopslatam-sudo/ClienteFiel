@@ -6,6 +6,7 @@ from sqlalchemy import select
 import mercadopago
 
 from app.core.config import settings
+from app.models.billing_profile import BillingProfile, DocumentType
 from app.models.subscription import Subscription, PaymentProvider
 from app.models.tenant import Tenant, TenantPlan, TenantStatus
 
@@ -180,6 +181,59 @@ class BillingService:
             "event": "billing.subscription_canceled",
             "tenant_id": str(tenant_id),
         })
+
+    async def get_billing_profile(self, tenant_id: uuid.UUID) -> BillingProfile | None:
+        result = await self.db.execute(
+            select(BillingProfile).where(BillingProfile.tenant_id == tenant_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def upsert_billing_profile(
+        self,
+        tenant_id: uuid.UUID,
+        document_type: DocumentType,
+        person_first_name: str,
+        person_last_name: str,
+        person_rut: str,
+        person_email: str,
+        company_name: str | None,
+        company_razon_social: str | None,
+        company_rut: str | None,
+        company_giro: str | None,
+    ) -> BillingProfile:
+        result = await self.db.execute(
+            select(BillingProfile).where(BillingProfile.tenant_id == tenant_id)
+        )
+        profile = result.scalar_one_or_none()
+
+        if profile:
+            profile.document_type = document_type
+            profile.person_first_name = person_first_name
+            profile.person_last_name = person_last_name
+            profile.person_rut = person_rut
+            profile.person_email = person_email
+            profile.company_name = company_name
+            profile.company_razon_social = company_razon_social
+            profile.company_rut = company_rut
+            profile.company_giro = company_giro
+        else:
+            profile = BillingProfile(
+                tenant_id=tenant_id,
+                document_type=document_type,
+                person_first_name=person_first_name,
+                person_last_name=person_last_name,
+                person_rut=person_rut,
+                person_email=person_email,
+                company_name=company_name,
+                company_razon_social=company_razon_social,
+                company_rut=company_rut,
+                company_giro=company_giro,
+            )
+            self.db.add(profile)
+
+        await self.db.commit()
+        await self.db.refresh(profile)
+        return profile
 
     async def _upsert_subscription(
         self,

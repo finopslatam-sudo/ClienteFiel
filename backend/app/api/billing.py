@@ -9,6 +9,7 @@ from app.core.dependencies import get_current_user, get_current_tenant
 from app.models.user import User
 from app.models.tenant import Tenant, TenantPlan
 from app.services.billing_service import BillingService
+from app.schemas.billing_profile import BillingProfileResponse, BillingProfileRequest
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 
@@ -91,3 +92,35 @@ async def cancel_subscription(
         raise HTTPException(status_code=404, detail=str(e))
 
     return {"message": "Suscripción cancelada"}
+
+
+@router.get("/profile", response_model=BillingProfileResponse | None)
+async def get_billing_profile(
+    current_user: Annotated[User, Depends(get_current_user)],
+    current_tenant: Annotated[Tenant, Depends(get_current_tenant)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    service = BillingService(db)
+    return await service.get_billing_profile(current_tenant.id)
+
+
+@router.put("/profile", response_model=BillingProfileResponse)
+async def upsert_billing_profile(
+    payload: BillingProfileRequest,
+    current_user: Annotated[User, Depends(get_current_user)],
+    current_tenant: Annotated[Tenant, Depends(get_current_tenant)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    service = BillingService(db)
+    return await service.upsert_billing_profile(
+        tenant_id=current_tenant.id,
+        document_type=payload.document_type,
+        person_first_name=payload.person_first_name,
+        person_last_name=payload.person_last_name,
+        person_rut=payload.person_rut,
+        person_email=payload.person_email,
+        company_name=payload.company_name,
+        company_razon_social=payload.company_razon_social,
+        company_rut=payload.company_rut,
+        company_giro=payload.company_giro,
+    )
