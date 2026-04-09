@@ -28,6 +28,14 @@ const baseSchema = z.object({
 
 type FormData = z.infer<typeof baseSchema>
 
+function formatRut(value: string): string {
+  const clean = value.replace(/[^0-9kK]/g, '').toUpperCase()
+  if (clean.length < 2) return clean
+  const body = clean.slice(0, -1)
+  const dv = clean.slice(-1)
+  return `${body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}-${dv}`
+}
+
 interface BillingProfileData {
   document_type: 'boleta' | 'factura'
   person_first_name: string
@@ -51,6 +59,7 @@ export function DocumentPreferenceModal({ onClose }: Props) {
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(baseSchema),
@@ -142,7 +151,7 @@ export function DocumentPreferenceModal({ onClose }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelClass} style={{ color: '#94a3b8' }}>RUT</label>
-              <input {...register('person_rut')} placeholder="12.345.678-9" className={inputClass} />
+              <input {...register('person_rut')} onChange={(e) => setValue('person_rut', formatRut(e.target.value), { shouldValidate: true })} placeholder="12.345.678-9" className={inputClass} />
               {errors.person_rut && <p className={errorClass} style={{ color: '#f87171' }}>{errors.person_rut.message}</p>}
             </div>
             <div>
@@ -168,7 +177,7 @@ export function DocumentPreferenceModal({ onClose }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass} style={{ color: '#94a3b8' }}>RUT empresa</label>
-                  <input {...register('company_rut')} placeholder="76.543.210-K" className={inputClass} />
+                  <input {...register('company_rut')} onChange={(e) => setValue('company_rut', formatRut(e.target.value), { shouldValidate: true })} placeholder="76.543.210-K" className={inputClass} />
                   {errors.company_rut && <p className={errorClass} style={{ color: '#f87171' }}>{errors.company_rut.message}</p>}
                 </div>
                 <div>

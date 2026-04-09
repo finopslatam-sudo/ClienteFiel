@@ -53,6 +53,14 @@ interface BillingProfileData {
   company_address: string | null
 }
 
+function formatRut(value: string): string {
+  const clean = value.replace(/[^0-9kK]/g, '').toUpperCase()
+  if (clean.length < 2) return clean
+  const body = clean.slice(0, -1)
+  const dv = clean.slice(-1)
+  return `${body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}-${dv}`
+}
+
 const inputClass = 'input-dark w-full px-3 py-2 text-sm'
 const labelClass = 'block text-sm font-medium mb-1'
 const errorClass = 'text-xs mt-1'
@@ -111,6 +119,7 @@ export default function CuentaPage() {
     defaultValues: { document_type: 'boleta' },
   })
   const billingDocType = billingForm.watch('document_type')
+  const setBillingValue = billingForm.setValue
 
   useEffect(() => {
     api.get<BillingProfileData | null>('/api/v1/billing/profile').then(({ data }) => {
@@ -286,7 +295,7 @@ export default function CuentaPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClass} style={{ color: '#94a3b8' }}>RUT</label>
-                <input {...billingForm.register('person_rut')} placeholder="12.345.678-9" className={inputClass} />
+                <input {...billingForm.register('person_rut')} onChange={(e) => setBillingValue('person_rut', formatRut(e.target.value), { shouldValidate: true })} placeholder="12.345.678-9" className={inputClass} />
                 {billingForm.formState.errors.person_rut && <p className={errorClass} style={{ color: '#f87171' }}>{billingForm.formState.errors.person_rut.message}</p>}
               </div>
               <div>
@@ -309,7 +318,7 @@ export default function CuentaPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className={labelClass} style={{ color: '#94a3b8' }}>RUT empresa</label>
-                    <input {...billingForm.register('company_rut')} placeholder="76.543.210-K" className={inputClass} />
+                    <input {...billingForm.register('company_rut')} onChange={(e) => setBillingValue('company_rut', formatRut(e.target.value), { shouldValidate: true })} placeholder="76.543.210-K" className={inputClass} />
                     {billingForm.formState.errors.company_rut && <p className={errorClass} style={{ color: '#f87171' }}>{billingForm.formState.errors.company_rut.message}</p>}
                   </div>
                   <div>
