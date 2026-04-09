@@ -42,6 +42,8 @@ async def client(db_engine):
 async def register_and_login(client: AsyncClient, email: str, business: str) -> str:
     """Helper: registrar un tenant y retornar su access_token."""
     response = await client.post("/api/v1/auth/register", json={
+        "first_name": "Test",
+        "last_name": "User",
         "business_name": business,
         "email": email,
         "password": "testpassword123",

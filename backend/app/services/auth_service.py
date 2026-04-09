@@ -19,7 +19,8 @@ class AuthService:
         self.db = db
 
     async def register(
-        self, business_name: str, email: str, password: str
+        self, business_name: str, email: str, password: str,
+        first_name: str = "", last_name: str = "",
     ) -> tuple[User, Tenant]:
         # Verificar email único
         result = await self.db.execute(select(User).where(User.email == email))
@@ -44,6 +45,8 @@ class AuthService:
             password_hash=hash_password(password),
             role=UserRole.admin,
             is_active=True,
+            first_name=first_name,
+            last_name=last_name,
         )
         self.db.add(user)
         await self.db.commit()

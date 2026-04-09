@@ -1,9 +1,10 @@
-# backend/app/schemas/auth.py
 import uuid
 from pydantic import BaseModel, EmailStr, field_validator
 
 
 class RegisterRequest(BaseModel):
+    first_name: str
+    last_name: str
     business_name: str
     email: EmailStr
     password: str
@@ -22,6 +23,13 @@ class RegisterRequest(BaseModel):
             raise ValueError("Business name cannot be empty")
         return v.strip()
 
+    @field_validator("first_name", "last_name")
+    @classmethod
+    def name_not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Name fields cannot be empty")
+        return v.strip()
+
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -38,6 +46,8 @@ class UserResponse(BaseModel):
     email: str
     role: str
     tenant_id: uuid.UUID
+    first_name: str | None
+    last_name: str | None
 
     model_config = {"from_attributes": True}
 

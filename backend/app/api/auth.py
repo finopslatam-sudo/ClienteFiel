@@ -25,7 +25,8 @@ async def register(
     service = AuthService(db)
     try:
         user, tenant = await service.register(
-            payload.business_name, payload.email, payload.password
+            payload.business_name, payload.email, payload.password,
+            first_name=payload.first_name, last_name=payload.last_name,
         )
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))
