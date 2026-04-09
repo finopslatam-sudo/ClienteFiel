@@ -6,6 +6,8 @@ from httpx import AsyncClient
 @pytest.mark.asyncio
 async def test_register_success(client: AsyncClient):
     response = await client.post("/api/v1/auth/register", json={
+        "first_name": "Ana",
+        "last_name": "López",
         "business_name": "Peluquería Style",
         "email": "owner@style.cl",
         "password": "password123",
@@ -19,7 +21,7 @@ async def test_register_success(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_register_duplicate_email(client: AsyncClient):
-    payload = {"business_name": "Negocio", "email": "dup@test.cl", "password": "password123"}
+    payload = {"first_name": "Test", "last_name": "User", "business_name": "Negocio", "email": "dup@test.cl", "password": "password123"}
     await client.post("/api/v1/auth/register", json=payload)
     response = await client.post("/api/v1/auth/register", json=payload)
     assert response.status_code == 409
@@ -28,6 +30,8 @@ async def test_register_duplicate_email(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_login_success(client: AsyncClient):
     await client.post("/api/v1/auth/register", json={
+        "first_name": "Spa",
+        "last_name": "Relax",
         "business_name": "Spa Relax",
         "email": "spa@relax.cl",
         "password": "mypassword",
@@ -45,7 +49,7 @@ async def test_login_success(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_login_wrong_password(client: AsyncClient):
     await client.post("/api/v1/auth/register", json={
-        "business_name": "Negocio", "email": "wrong@test.cl", "password": "correct",
+        "first_name": "Test", "last_name": "User", "business_name": "Negocio", "email": "wrong@test.cl", "password": "correct",
     })
     response = await client.post("/api/v1/auth/login", json={
         "email": "wrong@test.cl", "password": "incorrect",
@@ -62,7 +66,7 @@ async def test_protected_endpoint_without_token(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_protected_endpoint_with_valid_token(client: AsyncClient):
     reg = await client.post("/api/v1/auth/register", json={
-        "business_name": "Consultorio", "email": "doc@test.cl", "password": "pass1234",
+        "first_name": "Doc", "last_name": "Test", "business_name": "Consultorio", "email": "doc@test.cl", "password": "pass1234",
     })
     token = reg.json()["access_token"]
     response = await client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})

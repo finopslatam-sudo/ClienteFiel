@@ -17,10 +17,10 @@ FACTURA_PAYLOAD = {
     "person_last_name": "Chamorro",
     "person_rut": "12.345.678-9",
     "person_email": "richard@test.cl",
-    "company_name": "Riava SpA",
     "company_razon_social": "Riava Servicios SpA",
     "company_rut": "76.543.210-K",
     "company_giro": "Desarrollo de Software",
+    "company_address": "Av. Providencia 123, Santiago",
 }
 
 
@@ -61,7 +61,7 @@ async def test_upsert_billing_profile_factura(client: AsyncClient):
     assert resp.status_code == 200
     data = resp.json()
     assert data["document_type"] == "factura"
-    assert data["company_name"] == "Riava SpA"
+    assert data["company_razon_social"] == "Riava Servicios SpA"
     assert data["company_giro"] == "Desarrollo de Software"
 
 
