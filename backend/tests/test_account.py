@@ -52,3 +52,19 @@ async def test_update_account_persists(client: AsyncClient):
 async def test_account_requires_auth(client: AsyncClient):
     resp = await client.get("/api/v1/account/me")
     assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_update_account_does_not_affect_other_tenant(client: AsyncClient):
+    token_a = await register_and_login(client, "tenant_a@test.cl", "Empresa A")
+    token_b = await register_and_login(client, "tenant_b@test.cl", "Empresa B")
+    await client.put(
+        "/api/v1/account/me",
+        json={"first_name": "X", "last_name": "Y", "company_name": "Empresa A Modificada"},
+        headers={"Authorization": f"Bearer {token_a}"},
+    )
+    resp = await client.get(
+        "/api/v1/account/me",
+        headers={"Authorization": f"Bearer {token_b}"},
+    )
+    assert resp.json()["company_name"] == "Empresa B"

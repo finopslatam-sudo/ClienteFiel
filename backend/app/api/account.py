@@ -35,6 +35,8 @@ async def update_account(
     current_user.last_name = payload.last_name
     current_tenant.name = payload.company_name
     await db.commit()
+    await db.refresh(current_user)
+    await db.refresh(current_tenant)
     return AccountResponse(
         first_name=current_user.first_name,
         last_name=current_user.last_name,
