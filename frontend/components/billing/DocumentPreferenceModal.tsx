@@ -11,13 +11,13 @@ const baseSchema = z.object({
   person_last_name: z.string().min(1, 'Requerido'),
   person_rut: z.string().min(1, 'Requerido'),
   person_email: z.string().email('Email inválido'),
-  company_name: z.string().optional(),
   company_razon_social: z.string().optional(),
   company_rut: z.string().optional(),
   company_giro: z.string().optional(),
+  company_address: z.string().optional(),
 }).superRefine((data, ctx) => {
   if (data.document_type === 'factura') {
-    const companyFields = ['company_name', 'company_razon_social', 'company_rut', 'company_giro'] as const
+    const companyFields = ['company_razon_social', 'company_rut', 'company_giro', 'company_address'] as const
     for (const field of companyFields) {
       if (!data[field]) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Requerido', path: [field] })
@@ -34,10 +34,10 @@ interface BillingProfileData {
   person_last_name: string
   person_rut: string
   person_email: string
-  company_name: string | null
   company_razon_social: string | null
   company_rut: string | null
   company_giro: string | null
+  company_address: string | null
 }
 
 interface Props {
@@ -68,10 +68,10 @@ export function DocumentPreferenceModal({ onClose }: Props) {
           person_last_name: data.person_last_name,
           person_rut: data.person_rut,
           person_email: data.person_email,
-          company_name: data.company_name ?? '',
           company_razon_social: data.company_razon_social ?? '',
           company_rut: data.company_rut ?? '',
           company_giro: data.company_giro ?? '',
+          company_address: data.company_address ?? '',
         })
       }
     }).catch(() => {})
@@ -161,12 +161,7 @@ export function DocumentPreferenceModal({ onClose }: Props) {
                 Datos empresa
               </div>
               <div>
-                <label className={labelClass} style={{ color: '#94a3b8' }}>Nombre empresa</label>
-                <input {...register('company_name')} className={inputClass} />
-                {errors.company_name && <p className={errorClass} style={{ color: '#f87171' }}>{errors.company_name.message}</p>}
-              </div>
-              <div>
-                <label className={labelClass} style={{ color: '#94a3b8' }}>Razón Social</label>
+                <label className={labelClass} style={{ color: '#94a3b8' }}>Razón Social / Nombre de la empresa</label>
                 <input {...register('company_razon_social')} className={inputClass} />
                 {errors.company_razon_social && <p className={errorClass} style={{ color: '#f87171' }}>{errors.company_razon_social.message}</p>}
               </div>
@@ -181,6 +176,11 @@ export function DocumentPreferenceModal({ onClose }: Props) {
                   <input {...register('company_giro')} placeholder="Desarrollo de Software" className={inputClass} />
                   {errors.company_giro && <p className={errorClass} style={{ color: '#f87171' }}>{errors.company_giro.message}</p>}
                 </div>
+              </div>
+              <div>
+                <label className={labelClass} style={{ color: '#94a3b8' }}>Dirección</label>
+                <input {...register('company_address')} placeholder="Av. Ejemplo 123, Santiago" className={inputClass} />
+                {errors.company_address && <p className={errorClass} style={{ color: '#f87171' }}>{errors.company_address.message}</p>}
               </div>
             </>
           )}

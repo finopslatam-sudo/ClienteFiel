@@ -27,13 +27,13 @@ const billingSchema = z.object({
   person_last_name: z.string().min(1, 'Requerido'),
   person_rut: z.string().min(1, 'Requerido'),
   person_email: z.string().email('Email inválido'),
-  company_name: z.string().optional(),
   company_razon_social: z.string().optional(),
   company_rut: z.string().optional(),
   company_giro: z.string().optional(),
+  company_address: z.string().optional(),
 }).superRefine((data, ctx) => {
   if (data.document_type === 'factura') {
-    const fields = ['company_name', 'company_razon_social', 'company_rut', 'company_giro'] as const
+    const fields = ['company_razon_social', 'company_rut', 'company_giro', 'company_address'] as const
     for (const f of fields) {
       if (!data[f]) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Requerido', path: [f] })
     }
@@ -47,10 +47,10 @@ interface BillingProfileData {
   person_last_name: string
   person_rut: string
   person_email: string
-  company_name: string | null
   company_razon_social: string | null
   company_rut: string | null
   company_giro: string | null
+  company_address: string | null
 }
 
 const inputClass = 'input-dark w-full px-3 py-2 text-sm'
@@ -122,10 +122,10 @@ export default function CuentaPage() {
           person_last_name: data.person_last_name,
           person_rut: data.person_rut,
           person_email: data.person_email,
-          company_name: data.company_name ?? '',
           company_razon_social: data.company_razon_social ?? '',
           company_rut: data.company_rut ?? '',
           company_giro: data.company_giro ?? '',
+          company_address: data.company_address ?? '',
         })
       }
     }).catch(() => {})
@@ -238,10 +238,6 @@ export default function CuentaPage() {
               {billingProfile?.document_type === 'factura' && (
                 <>
                   <div className="flex gap-4">
-                    <dt className="w-32 text-sm shrink-0" style={{ color: '#64748b' }}>Empresa</dt>
-                    <dd className="text-sm" style={{ color: '#f1f5f9' }}>{billingProfile.company_name}</dd>
-                  </div>
-                  <div className="flex gap-4">
                     <dt className="w-32 text-sm shrink-0" style={{ color: '#64748b' }}>Razón Social</dt>
                     <dd className="text-sm" style={{ color: '#f1f5f9' }}>{billingProfile.company_razon_social}</dd>
                   </div>
@@ -252,6 +248,10 @@ export default function CuentaPage() {
                   <div className="flex gap-4">
                     <dt className="w-32 text-sm shrink-0" style={{ color: '#64748b' }}>Giro</dt>
                     <dd className="text-sm" style={{ color: '#f1f5f9' }}>{billingProfile.company_giro}</dd>
+                  </div>
+                  <div className="flex gap-4">
+                    <dt className="w-32 text-sm shrink-0" style={{ color: '#64748b' }}>Dirección</dt>
+                    <dd className="text-sm" style={{ color: '#f1f5f9' }}>{billingProfile.company_address}</dd>
                   </div>
                 </>
               )}
@@ -302,12 +302,7 @@ export default function CuentaPage() {
                   Datos empresa
                 </div>
                 <div>
-                  <label className={labelClass} style={{ color: '#94a3b8' }}>Nombre empresa</label>
-                  <input {...billingForm.register('company_name')} className={inputClass} />
-                  {billingForm.formState.errors.company_name && <p className={errorClass} style={{ color: '#f87171' }}>{billingForm.formState.errors.company_name.message}</p>}
-                </div>
-                <div>
-                  <label className={labelClass} style={{ color: '#94a3b8' }}>Razón Social</label>
+                  <label className={labelClass} style={{ color: '#94a3b8' }}>Razón Social / Nombre de la empresa</label>
                   <input {...billingForm.register('company_razon_social')} className={inputClass} />
                   {billingForm.formState.errors.company_razon_social && <p className={errorClass} style={{ color: '#f87171' }}>{billingForm.formState.errors.company_razon_social.message}</p>}
                 </div>
@@ -322,6 +317,11 @@ export default function CuentaPage() {
                     <input {...billingForm.register('company_giro')} placeholder="Desarrollo de Software" className={inputClass} />
                     {billingForm.formState.errors.company_giro && <p className={errorClass} style={{ color: '#f87171' }}>{billingForm.formState.errors.company_giro.message}</p>}
                   </div>
+                </div>
+                <div>
+                  <label className={labelClass} style={{ color: '#94a3b8' }}>Dirección</label>
+                  <input {...billingForm.register('company_address')} placeholder="Av. Ejemplo 123, Santiago" className={inputClass} />
+                  {billingForm.formState.errors.company_address && <p className={errorClass} style={{ color: '#f87171' }}>{billingForm.formState.errors.company_address.message}</p>}
                 </div>
               </>
             )}

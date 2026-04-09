@@ -12,6 +12,7 @@ class BillingProfileResponse(BaseModel):
     company_razon_social: str | None
     company_rut: str | None
     company_giro: str | None
+    company_address: str | None
 
     model_config = {"from_attributes": True}
 
@@ -26,12 +27,13 @@ class BillingProfileRequest(BaseModel):
     company_razon_social: str | None = None
     company_rut: str | None = None
     company_giro: str | None = None
+    company_address: str | None = None
 
     @model_validator(mode="after")
     def company_fields_required_for_factura(self) -> "BillingProfileRequest":
         if self.document_type == DocumentType.factura:
             missing = [
-                f for f in ("company_name", "company_razon_social", "company_rut", "company_giro")
+                f for f in ("company_razon_social", "company_rut", "company_giro", "company_address")
                 if not getattr(self, f)
             ]
             if missing:

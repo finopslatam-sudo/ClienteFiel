@@ -200,6 +200,7 @@ class BillingService:
         company_razon_social: str | None,
         company_rut: str | None,
         company_giro: str | None,
+        company_address: str | None,
     ) -> BillingProfile:
         result = await self.db.execute(
             select(BillingProfile).where(BillingProfile.tenant_id == tenant_id)
@@ -216,6 +217,7 @@ class BillingService:
             profile.company_razon_social = company_razon_social
             profile.company_rut = company_rut
             profile.company_giro = company_giro
+            profile.company_address = company_address
         else:
             profile = BillingProfile(
                 tenant_id=tenant_id,
@@ -228,6 +230,7 @@ class BillingService:
                 company_razon_social=company_razon_social,
                 company_rut=company_rut,
                 company_giro=company_giro,
+                company_address=company_address,
             )
             self.db.add(profile)
 

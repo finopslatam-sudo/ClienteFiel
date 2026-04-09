@@ -19,8 +19,8 @@ class BillingProfile(Base, TimestampMixin):
     __table_args__ = (
         sa.CheckConstraint(
             "(document_type = 'boleta') OR "
-            "(company_name IS NOT NULL AND company_razon_social IS NOT NULL "
-            "AND company_rut IS NOT NULL AND company_giro IS NOT NULL)",
+            "(company_razon_social IS NOT NULL AND company_rut IS NOT NULL "
+            "AND company_giro IS NOT NULL AND company_address IS NOT NULL)",
             name="ck_billing_profile_factura_fields"
         ),
     )
@@ -43,5 +43,6 @@ class BillingProfile(Base, TimestampMixin):
     company_razon_social: Mapped[str | None] = mapped_column(String(255), nullable=True)
     company_rut: Mapped[str | None] = mapped_column(String(20), nullable=True)
     company_giro: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    company_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="billing_profile")

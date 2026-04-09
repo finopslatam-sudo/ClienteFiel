@@ -123,4 +123,5 @@ async def upsert_billing_profile(
         company_razon_social=payload.company_razon_social,
         company_rut=payload.company_rut,
         company_giro=payload.company_giro,
+        company_address=payload.company_address,
     )
