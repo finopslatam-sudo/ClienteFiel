@@ -1,7 +1,9 @@
 // frontend/app/(dashboard)/suscripcion/page.tsx
 'use client'
 import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/api'
+import { DocumentPreferenceModal } from '@/components/billing/DocumentPreferenceModal'
 
 interface SubscriptionStatus {
   plan: string
@@ -68,11 +70,25 @@ const plans = [
 ]
 
 export default function SuscripcionPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [subscribing, setSubscribing] = useState<string | null>(null)
   const [canceling, setCanceling] = useState(false)
   const [error, setError] = useState('')
+  const [showModal, setShowModal] = useState(false)
+
+  useEffect(() => {
+    if (searchParams.get('subscribed') === 'true') {
+      setShowModal(true)
+    }
+  }, [searchParams])
+
+  const handleModalClose = () => {
+    setShowModal(false)
+    router.replace('/suscripcion')
+  }
 
   useEffect(() => {
     api.get<SubscriptionStatus>('/api/v1/billing/subscription')
@@ -85,7 +101,7 @@ export default function SuscripcionPage() {
     setSubscribing(planKey)
     setError('')
     try {
-      const backUrl = `${window.location.origin}/dashboard?subscribed=true`
+      const backUrl = `${window.location.origin}/suscripcion?subscribed=true`
       const { data } = await api.post<{ checkout_url: string }>('/api/v1/billing/subscribe', {
         plan: planKey,
         back_url: backUrl,
@@ -241,6 +257,8 @@ export default function SuscripcionPage() {
       <p className="text-xs mt-6 text-center" style={{ color: '#475569' }}>
         Pago recurrente mensual · Cancela cuando quieras · Sin contratos
       </p>
+
+      {showModal && <DocumentPreferenceModal onClose={handleModalClose} />}
     </div>
   )
 }
