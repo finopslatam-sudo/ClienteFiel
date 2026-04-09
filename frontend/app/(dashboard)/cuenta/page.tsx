@@ -238,7 +238,7 @@ export default function CuentaPage() {
               </div>
               <div className="flex gap-4">
                 <dt className="w-32 text-sm shrink-0" style={{ color: '#64748b' }}>RUT</dt>
-                <dd className="text-sm" style={{ color: '#f1f5f9' }}>{billingProfile?.person_rut}</dd>
+                <dd className="text-sm" style={{ color: '#f1f5f9' }}>{billingProfile?.person_rut ? formatRut(billingProfile.person_rut) : '—'}</dd>
               </div>
               <div className="flex gap-4">
                 <dt className="w-32 text-sm shrink-0" style={{ color: '#64748b' }}>Email</dt>
@@ -252,7 +252,7 @@ export default function CuentaPage() {
                   </div>
                   <div className="flex gap-4">
                     <dt className="w-32 text-sm shrink-0" style={{ color: '#64748b' }}>RUT empresa</dt>
-                    <dd className="text-sm" style={{ color: '#f1f5f9' }}>{billingProfile.company_rut}</dd>
+                    <dd className="text-sm" style={{ color: '#f1f5f9' }}>{billingProfile.company_rut ? formatRut(billingProfile.company_rut) : '—'}</dd>
                   </div>
                   <div className="flex gap-4">
                     <dt className="w-32 text-sm shrink-0" style={{ color: '#64748b' }}>Giro</dt>
