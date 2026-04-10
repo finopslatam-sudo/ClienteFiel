@@ -324,6 +324,6 @@ async def test_mp_webhook_unknown_type_ignored(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_plan_prices_are_defined():
-    assert PLAN_PRICES_CLP[TenantPlan.basic] == 1000
+    assert PLAN_PRICES_CLP[TenantPlan.basic] == 3000
     assert PLAN_PRICES_CLP[TenantPlan.medium] == 40000
     assert PLAN_PRICES_CLP[TenantPlan.premium] == 60000
