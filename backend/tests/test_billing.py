@@ -112,6 +112,7 @@ async def test_create_mp_subscription_mp_error_raises(db_session: AsyncSession, 
                 tenant_id=tenant.id,
                 plan=TenantPlan.medium,
                 back_url="https://clientefiel.riava.cl/dashboard",
+                payer_email="test@example.com",
             )
 
 
