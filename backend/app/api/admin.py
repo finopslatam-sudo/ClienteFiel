@@ -11,7 +11,7 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_superadmin
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.superadmin import SuperAdminUser
-from app.models.tenant import Tenant, TenantPlan, TenantStatus
+from app.models.tenant import Tenant, TenantPlan
 from app.models.user import User
 from app.models.subscription import Subscription
 from app.models.whatsapp import WhatsappConnection
