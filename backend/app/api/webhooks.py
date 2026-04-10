@@ -96,21 +96,25 @@ async def receive_whatsapp_webhook(
     return Response(status_code=200)
 
 
-def _verify_mp_signature(payload: bytes, signature_header: str, ts: str) -> bool:
-    """Valida x-signature de Mercado Pago usando HMAC-SHA256."""
+def _verify_mp_signature(data_id: str, request_id: str, signature_header: str) -> bool:
+    """
+    Valida x-signature de Mercado Pago.
+    Template: id=<data.id>;request-id=<x-request-id>;ts=<timestamp>;
+    """
     secret = settings.mp_webhook_secret
     if not secret:
         return True  # sin secret configurado, permitir (dev/sandbox)
     try:
-        signed_template = f"ts={ts};v1={payload.decode()}"
+        # Extraer ts y v1 del header "ts=...,v1=..."
+        parts = {p.split("=", 1)[0].strip(): p.split("=", 1)[1].strip()
+                 for p in signature_header.split(",") if "=" in p}
+        ts = parts.get("ts", "")
+        v1 = parts.get("v1", "")
+        signed_template = f"id={data_id};request-id={request_id};ts={ts};"
         expected = hmac.new(secret.encode(), signed_template.encode(), hashlib.sha256).hexdigest()
-        for part in signature_header.split(","):
-            part = part.strip()
-            if part.startswith("v1=") and hmac.compare_digest(part[3:], expected):
-                return True
+        return hmac.compare_digest(v1, expected)
     except Exception:
-        pass
-    return False
+        return False
 
 
 @router.post("/mercadopago")
@@ -125,12 +129,6 @@ async def receive_mercadopago_webhook(
     """
     raw_body = await request.body()
 
-    sig_header = request.headers.get("x-signature", "")
-    ts_header = request.headers.get("x-request-id", "")
-    if sig_header and not _verify_mp_signature(raw_body, sig_header, ts_header):
-        logger.warning({"event": "webhook.mp_invalid_signature"})
-        return Response(status_code=200)
-
     try:
         body = json.loads(raw_body)
     except Exception:
@@ -143,6 +141,12 @@ async def receive_mercadopago_webhook(
     )
 
     if topic not in ("subscription_preapproval", "preapproval") or not resource_id:
+        return Response(status_code=200)
+
+    sig_header = request.headers.get("x-signature", "")
+    request_id = request.headers.get("x-request-id", "")
+    if sig_header and not _verify_mp_signature(str(resource_id), request_id, sig_header):
+        logger.warning({"event": "webhook.mp_invalid_signature", "resource_id": resource_id})
         return Response(status_code=200)
 
     try:

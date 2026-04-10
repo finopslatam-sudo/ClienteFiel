@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     cookie_domain: str = ""
     mp_access_token: str = ""
     mp_webhook_secret: str = ""
+    backend_url: str = "https://api.clientefiel.riava.cl"
 
     model_config = {"env_file": ".env"}
 

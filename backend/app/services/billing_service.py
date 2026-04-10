@@ -59,6 +59,7 @@ class BillingService:
                 "currency_id": "CLP",
             },
             "back_url": back_url,
+            "notification_url": f"{settings.backend_url}/api/v1/webhooks/mercadopago",
             "status": "pending",
             "external_reference": str(tenant_id),
         }
