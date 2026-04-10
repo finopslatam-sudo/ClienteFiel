@@ -261,22 +261,6 @@ function SuscripcionContent() {
         Pago recurrente mensual · Cancela cuando quieras · Sin contratos
       </p>
 
-      <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(6,182,212,0.1)' }}>
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-sm font-medium" style={{ color: '#f1f5f9' }}>Datos de facturación</div>
-            <div className="text-xs mt-0.5" style={{ color: '#64748b' }}>Boleta o factura para tus pagos mensuales</div>
-          </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="text-sm px-4 py-2 rounded-lg transition-colors"
-            style={{ color: '#06b6d4', border: '1px solid rgba(6,182,212,0.3)' }}
-          >
-            Configurar
-          </button>
-        </div>
-      </div>
-
       {showModal && <DocumentPreferenceModal onClose={handleModalClose} />}
     </div>
   )

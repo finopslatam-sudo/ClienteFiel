@@ -1,5 +1,6 @@
 # backend/app/api/billing.py
 from typing import Annotated
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,6 +29,7 @@ class SubscriptionStatusResponse(BaseModel):
     status: str
     provider: str
     external_subscription_id: str | None
+    trial_ends_at: datetime | None
 
 
 @router.post("/subscribe", response_model=SubscribeResponse)
@@ -68,6 +70,7 @@ async def get_subscription(
             status=current_tenant.status.value,
             provider="none",
             external_subscription_id=None,
+            trial_ends_at=current_tenant.trial_ends_at,
         )
 
     return SubscriptionStatusResponse(
@@ -75,6 +78,7 @@ async def get_subscription(
         status=sub.status.value,
         provider=sub.provider.value,
         external_subscription_id=sub.external_subscription_id,
+        trial_ends_at=current_tenant.trial_ends_at,
     )
 
 
