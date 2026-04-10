@@ -39,7 +39,6 @@ class BillingService:
         tenant_id: uuid.UUID,
         plan: TenantPlan,
         back_url: str,
-        payer_email: str,
     ) -> str:
         """
         Crea una suscripción recurrente en Mercado Pago (Preapproval).
@@ -51,7 +50,6 @@ class BillingService:
 
         preapproval_data = {
             "reason": plan_name,
-            "payer_email": payer_email,
             "auto_recurring": {
                 "frequency": 1,
                 "frequency_type": "months",
