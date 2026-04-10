@@ -9,6 +9,7 @@ from app.core.database import get_db
 from app.core.security import decode_access_token
 from app.models.user import User, UserRole
 from app.models.tenant import Tenant
+from app.models.superadmin import SuperAdminUser
 
 bearer_scheme = HTTPBearer()
 
@@ -59,3 +60,28 @@ async def require_admin(
             detail="Admin role required",
         )
     return current_user
+
+
+async def get_current_superadmin(
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> SuperAdminUser:
+    token = credentials.credentials
+    try:
+        payload = decode_access_token(token)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+
+    if not payload.get("superadmin"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Superadmin access required")
+
+    admin_id: str | None = payload.get("sub")
+    if not admin_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+
+    result = await db.execute(select(SuperAdminUser).where(SuperAdminUser.id == uuid.UUID(admin_id)))
+    admin = result.scalar_one_or_none()
+    if not admin or not admin.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Superadmin not found or inactive")
+
+    return admin
