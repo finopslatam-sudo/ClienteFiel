@@ -9,6 +9,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('refresh_token')?.value
 
   const isPublic = PUBLIC_PATHS.some((p) => pathname === p) ||
+    pathname.startsWith('/admin') ||
     pathname.startsWith('/book/') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api')
