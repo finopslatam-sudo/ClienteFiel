@@ -31,7 +31,7 @@ class AuthService:
         tenant = Tenant(
             name=business_name,
             slug=_slugify(business_name),
-            plan=TenantPlan.basic,
+            plan=TenantPlan.premium,
             status=TenantStatus.trial,
             trial_ends_at=(datetime.now(timezone.utc) + timedelta(days=14)).replace(tzinfo=None),
         )

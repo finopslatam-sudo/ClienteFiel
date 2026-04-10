@@ -96,6 +96,23 @@ async def receive_whatsapp_webhook(
     return Response(status_code=200)
 
 
+def _verify_mp_signature(payload: bytes, signature_header: str, ts: str) -> bool:
+    """Valida x-signature de Mercado Pago usando HMAC-SHA256."""
+    secret = settings.mp_webhook_secret
+    if not secret:
+        return True  # sin secret configurado, permitir (dev/sandbox)
+    try:
+        signed_template = f"ts={ts};v1={payload.decode()}"
+        expected = hmac.new(secret.encode(), signed_template.encode(), hashlib.sha256).hexdigest()
+        for part in signature_header.split(","):
+            part = part.strip()
+            if part.startswith("v1=") and hmac.compare_digest(part[3:], expected):
+                return True
+    except Exception:
+        pass
+    return False
+
+
 @router.post("/mercadopago")
 async def receive_mercadopago_webhook(
     request: Request,
@@ -106,8 +123,16 @@ async def receive_mercadopago_webhook(
     MP envía: {"type": "subscription_preapproval", "data": {"id": "..."}}
     Siempre retornar 200 — MP reintenta si no recibe 200.
     """
+    raw_body = await request.body()
+
+    sig_header = request.headers.get("x-signature", "")
+    ts_header = request.headers.get("x-request-id", "")
+    if sig_header and not _verify_mp_signature(raw_body, sig_header, ts_header):
+        logger.warning({"event": "webhook.mp_invalid_signature"})
+        return Response(status_code=200)
+
     try:
-        body = await request.json()
+        body = json.loads(raw_body)
     except Exception:
         return Response(status_code=200)
 
