@@ -25,7 +25,7 @@ adminApi.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('admin_access_token')
-        window.location.href = '/admin/login'
+        window.location.href = '/login'
       }
     }
     return Promise.reject(error)

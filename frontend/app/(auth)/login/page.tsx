@@ -1,13 +1,14 @@
 // frontend/app/(auth)/login/page.tsx
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
 import { login } from '@/lib/auth'
+import adminApi from '@/lib/adminApi'
 import { fadeInUp } from '@/lib/motion'
 
 const schema = z.object({
@@ -18,16 +19,32 @@ type FormData = z.infer<typeof schema>
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [error, setError] = useState('')
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
 
   const onSubmit = async (data: FormData) => {
+    setError('')
+    // Try tenant login first
     try {
-      setError('')
       await login(data)
-      router.push('/agenda')
+      const redirect = searchParams.get('redirect')
+      router.push(redirect && !redirect.startsWith('/admin') ? redirect : '/agenda')
+      return
+    } catch {
+      // not a tenant user — try superadmin
+    }
+    // Try superadmin login
+    try {
+      const { data: adminData } = await adminApi.post<{ access_token: string }>(
+        '/api/v1/admin/auth/login',
+        { email: data.email, password: data.password }
+      )
+      localStorage.setItem('admin_access_token', adminData.access_token)
+      router.push('/admin/dashboard')
+      return
     } catch {
       setError('Email o contraseña incorrectos')
     }

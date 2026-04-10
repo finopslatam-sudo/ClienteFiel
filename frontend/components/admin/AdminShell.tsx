@@ -17,7 +17,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !localStorage.getItem('admin_access_token')) {
-      router.replace('/admin/login')
+      router.replace('/login')
     }
   }, [router])
 
