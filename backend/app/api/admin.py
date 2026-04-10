@@ -1,5 +1,6 @@
 # backend/app/api/admin.py
 import uuid
+import secrets
 import logging
 from datetime import datetime, timezone
 from typing import Annotated
@@ -19,6 +20,7 @@ from app.schemas.admin import (
     AdminLoginRequest, AdminTokenResponse, AdminMetricsResponse,
     TenantSummary, TenantDetail, TenantSubscriptionInfo, UserInfo,
     BillingInfo, WhatsAppCredentialInfo, ChangePlanRequest,
+    ChangeAdminPasswordRequest, ResetTenantUserPasswordRequest, ResetPasswordResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -248,6 +250,39 @@ async def change_tenant_plan(
             external_subscription_id=sub_row.external_subscription_id,
         ) if sub_row else None,
     )
+
+
+@router.put("/auth/password", status_code=204)
+async def change_admin_password(
+    payload: ChangeAdminPasswordRequest,
+    admin: Annotated[SuperAdminUser, Depends(get_current_superadmin)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    if not verify_password(payload.current_password, admin.password_hash):
+        raise HTTPException(status_code=400, detail="Contraseña actual incorrecta")
+    admin.password_hash = hash_password(payload.new_password)
+    await db.commit()
+    logger.info({"event": "admin.password_changed", "admin_id": str(admin.id)})
+
+
+@router.post("/tenants/{tenant_id}/reset-password", response_model=ResetPasswordResponse)
+async def reset_tenant_user_password(
+    tenant_id: uuid.UUID,
+    payload: ResetTenantUserPasswordRequest,
+    _: Annotated[SuperAdminUser, Depends(get_current_superadmin)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    user = (await db.execute(
+        select(User).where(User.id == payload.user_id, User.tenant_id == tenant_id)
+    )).scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado en este tenant")
+
+    temp_password = secrets.token_urlsafe(12)
+    user.password_hash = hash_password(temp_password)
+    await db.commit()
+    logger.info({"event": "admin.tenant_password_reset", "tenant_id": str(tenant_id), "user_id": str(user.id)})
+    return ResetPasswordResponse(temporary_password=temp_password)
 
 
 @router.get("/tenants/{tenant_id}/credentials", response_model=WhatsAppCredentialInfo | None)

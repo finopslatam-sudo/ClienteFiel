@@ -8,6 +8,7 @@ const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/admin/tenants', label: 'Clientes', icon: '🏢' },
   { href: '/admin/credentials', label: 'Credenciales', icon: '🔑' },
+  { href: '/admin/settings', label: 'Ajustes', icon: '⚙️' },
 ]
 
 export function AdminShell({ children }: { children: ReactNode }) {

@@ -101,3 +101,16 @@ class TenantDetail(BaseModel):
 
 class ChangePlanRequest(BaseModel):
     plan: str  # basic | medium | premium
+
+
+class ChangeAdminPasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class ResetTenantUserPasswordRequest(BaseModel):
+    user_id: uuid.UUID
+
+
+class ResetPasswordResponse(BaseModel):
+    temporary_password: str

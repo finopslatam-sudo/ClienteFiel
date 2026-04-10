@@ -5,6 +5,11 @@ import { useParams, useRouter } from 'next/navigation'
 import { AdminShell } from '@/components/admin/AdminShell'
 import adminApi from '@/lib/adminApi'
 
+interface ResetResult {
+  userId: string
+  tempPassword: string
+}
+
 interface UserInfo {
   id: string
   email: string
@@ -74,12 +79,28 @@ export default function TenantDetailPage() {
   const router = useRouter()
   const [tenant, setTenant] = useState<TenantDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [resetting, setResetting] = useState<string | null>(null)
+  const [resetResult, setResetResult] = useState<ResetResult | null>(null)
 
   useEffect(() => {
     adminApi.get<TenantDetail>(`/api/v1/admin/tenants/${id}`)
       .then(({ data }) => setTenant(data))
       .finally(() => setLoading(false))
   }, [id])
+
+  const handleResetPassword = async (userId: string) => {
+    setResetting(userId)
+    setResetResult(null)
+    try {
+      const { data } = await adminApi.post<{ temporary_password: string }>(
+        `/api/v1/admin/tenants/${id}/reset-password`,
+        { user_id: userId }
+      )
+      setResetResult({ userId, tempPassword: data.temporary_password })
+    } finally {
+      setResetting(null)
+    }
+  }
 
   if (loading) return <AdminShell><p style={{ color: '#475569' }}>Cargando...</p></AdminShell>
   if (!tenant) return <AdminShell><p style={{ color: '#ef4444' }}>Tenant no encontrado.</p></AdminShell>
@@ -115,19 +136,42 @@ export default function TenantDetailPage() {
           <p className="text-sm" style={{ color: '#475569' }}>Sin usuarios</p>
         ) : (
           tenant.users.map((u) => (
-            <div key={u.id} className="flex justify-between py-1.5" style={{ borderBottom: '1px solid rgba(6,182,212,0.06)' }}>
-              <div>
-                <span className="text-sm" style={{ color: '#f1f5f9' }}>
-                  {u.first_name} {u.last_name}
-                </span>
-                <span className="text-xs ml-2" style={{ color: '#475569' }}>{u.email}</span>
+            <div key={u.id}>
+              <div className="flex justify-between items-center py-1.5" style={{ borderBottom: '1px solid rgba(6,182,212,0.06)' }}>
+                <div>
+                  <span className="text-sm" style={{ color: '#f1f5f9' }}>
+                    {u.first_name} {u.last_name}
+                  </span>
+                  <span className="text-xs ml-2" style={{ color: '#475569' }}>{u.email}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs" style={{ color: '#64748b' }}>{u.role}</span>
+                  <span className="text-xs" style={{ color: u.is_active ? '#10b981' : '#ef4444' }}>
+                    {u.is_active ? 'Activo' : 'Inactivo'}
+                  </span>
+                  <button
+                    onClick={() => handleResetPassword(u.id)}
+                    disabled={resetting === u.id}
+                    className="text-xs px-2 py-0.5 rounded"
+                    style={{
+                      border: '1px solid rgba(239,68,68,0.3)',
+                      color: '#ef4444',
+                      opacity: resetting === u.id ? 0.5 : 1,
+                    }}
+                  >
+                    {resetting === u.id ? '...' : 'Reset pwd'}
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs" style={{ color: '#64748b' }}>{u.role}</span>
-                <span className="text-xs" style={{ color: u.is_active ? '#10b981' : '#ef4444' }}>
-                  {u.is_active ? 'Activo' : 'Inactivo'}
-                </span>
-              </div>
+              {resetResult?.userId === u.id && (
+                <div
+                  className="mt-1 mb-2 px-3 py-2 rounded-lg text-xs flex items-center justify-between"
+                  style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', color: '#fca5a5' }}
+                >
+                  <span>Contraseña temporal: <span className="font-mono font-bold" style={{ color: '#f1f5f9' }}>{resetResult.tempPassword}</span></span>
+                  <button onClick={() => setResetResult(null)} style={{ color: '#475569' }}>✕</button>
+                </div>
+              )}
             </div>
           ))
         )}
