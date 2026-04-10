@@ -30,8 +30,8 @@ const plans = [
   {
     key: 'basic',
     name: 'Básico',
-    priceCLP: '$1.000',
-    priceUSD: 'USD 1',
+    priceCLP: '$3.000',
+    priceUSD: 'USD 3',
     subtitle: 'Agenda Automatizada',
     features: [
       'Reservas vía WhatsApp',

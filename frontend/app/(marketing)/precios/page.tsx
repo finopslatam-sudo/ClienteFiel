@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Precios — Cliente Fiel',
   description:
-    'Planes simples sin sorpresas. Básico $1.000 CLP, Medio $40.000 CLP, Premium $60.000 CLP. 14 días gratis, sin tarjeta.',
+    'Planes simples sin sorpresas. Básico $3.000 CLP, Medio $40.000 CLP, Premium $60.000 CLP. 14 días gratis, sin tarjeta.',
 }
 
 export default function PreciosPage() {
