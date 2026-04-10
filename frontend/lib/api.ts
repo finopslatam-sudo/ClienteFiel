@@ -27,7 +27,9 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config as RetryableRequestConfig
-    if (error.response?.status === 401 && !original._retry) {
+    const url = original.url ?? ''
+    const isAuthEndpoint = url.includes('/auth/login') || url.includes('/auth/refresh') || url.includes('/auth/register')
+    if (error.response?.status === 401 && !original._retry && !isAuthEndpoint) {
       original._retry = true
       try {
         const refreshConfig = { _retry: true } as RetryableRequestConfig
