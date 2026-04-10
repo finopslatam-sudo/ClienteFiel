@@ -1,5 +1,6 @@
 // frontend/app/(marketing)/layout.tsx
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,8 +13,8 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         }}
       >
         <nav className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="font-bold text-xl" style={{ color: '#f1f5f9' }}>
-            Cliente Fiel
+          <Link href="/" className="flex items-center">
+            <Image src="/logo.png" alt="Cliente Fiel" width={140} height={48} priority />
           </Link>
           <div className="flex items-center gap-6">
             <Link
@@ -48,7 +49,9 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         }}
       >
         <div className="max-w-6xl mx-auto px-4 text-center text-sm">
-          <p className="font-semibold mb-2" style={{ color: '#f1f5f9' }}>Cliente Fiel</p>
+          <div className="flex justify-center mb-3">
+            <Image src="/logo.png" alt="Cliente Fiel" width={100} height={34} />
+          </div>
           <p style={{ color: '#475569' }}>Automatiza tu WhatsApp Business. Sin apps, sin complicaciones.</p>
           <p className="mt-4" style={{ color: '#475569' }}>© 2026 Cliente Fiel. Chile.</p>
         </div>
