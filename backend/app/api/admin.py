@@ -21,6 +21,7 @@ from app.schemas.admin import (
     TenantSummary, TenantDetail, TenantSubscriptionInfo, UserInfo,
     BillingInfo, WhatsAppCredentialInfo, ChangePlanRequest,
     ChangeAdminPasswordRequest, ResetTenantUserPasswordRequest, ResetPasswordResponse,
+    UpdateTenantUserRequest,
 )
 
 logger = logging.getLogger(__name__)
@@ -91,7 +92,17 @@ async def list_tenants(
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=50, le=200),
 ):
+    # Exclude tenants owned by superadmins
+    admin_emails = (await db.execute(select(SuperAdminUser.email))).scalars().all()
+    excluded_tenant_ids: list[uuid.UUID] = []
+    if admin_emails:
+        excluded_tenant_ids = (await db.execute(
+            select(User.tenant_id).where(User.email.in_(admin_emails))
+        )).scalars().all()
+
     query = select(Tenant).order_by(Tenant.created_at.desc()).offset(offset).limit(limit)
+    if excluded_tenant_ids:
+        query = query.where(Tenant.id.notin_(excluded_tenant_ids))
     if search:
         query = query.where(Tenant.name.ilike(f"%{search}%"))
 
@@ -283,6 +294,36 @@ async def reset_tenant_user_password(
     await db.commit()
     logger.info({"event": "admin.tenant_password_reset", "tenant_id": str(tenant_id), "user_id": str(user.id)})
     return ResetPasswordResponse(temporary_password=temp_password)
+
+
+@router.put("/tenants/{tenant_id}/users/{user_id}", response_model=UserInfo)
+async def update_tenant_user(
+    tenant_id: uuid.UUID,
+    user_id: uuid.UUID,
+    payload: UpdateTenantUserRequest,
+    _: Annotated[SuperAdminUser, Depends(get_current_superadmin)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    user = (await db.execute(
+        select(User).where(User.id == user_id, User.tenant_id == tenant_id)
+    )).scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    if payload.first_name is not None:
+        user.first_name = payload.first_name
+    if payload.last_name is not None:
+        user.last_name = payload.last_name
+    if payload.email is not None:
+        user.email = payload.email
+
+    await db.commit()
+    logger.info({"event": "admin.user_updated", "tenant_id": str(tenant_id), "user_id": str(user_id)})
+    return UserInfo(
+        id=user.id, email=user.email, first_name=user.first_name,
+        last_name=user.last_name, role=user.role.value,
+        is_active=user.is_active, created_at=user.created_at,
+    )
 
 
 @router.get("/tenants/{tenant_id}/credentials", response_model=WhatsAppCredentialInfo | None)

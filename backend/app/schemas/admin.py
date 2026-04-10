@@ -114,3 +114,9 @@ class ResetTenantUserPasswordRequest(BaseModel):
 
 class ResetPasswordResponse(BaseModel):
     temporary_password: str
+
+
+class UpdateTenantUserRequest(BaseModel):
+    first_name: str | None = None
+    last_name: str | None = None
+    email: str | None = None
