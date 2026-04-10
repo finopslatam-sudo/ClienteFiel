@@ -52,7 +52,7 @@ async def get_metrics(
     _: Annotated[SuperAdminUser, Depends(get_current_superadmin)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    total = (await db.execute(func.count(Tenant.id))).scalar() or 0
+    total = (await db.execute(select(func.count(Tenant.id)))).scalar() or 0
 
     status_rows = (await db.execute(
         select(Tenant.status, func.count(Tenant.id)).group_by(Tenant.status)
@@ -65,13 +65,13 @@ async def get_metrics(
     by_plan = {row[0].value: row[1] for row in plan_rows}
 
     wa_count = (await db.execute(
-        func.count(WhatsappConnection.id).where(WhatsappConnection.is_active == True)  # noqa: E712
+        select(func.count(WhatsappConnection.id)).where(WhatsappConnection.is_active == True)  # noqa: E712
     )).scalar() or 0
 
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     first_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     new_count = (await db.execute(
-        func.count(Tenant.id).where(Tenant.created_at >= first_of_month)
+        select(func.count(Tenant.id)).where(Tenant.created_at >= first_of_month)
     )).scalar() or 0
 
     return AdminMetricsResponse(
@@ -100,7 +100,7 @@ async def list_tenants(
 
     for tenant in tenants:
         user_count = (await db.execute(
-            func.count(User.id).where(User.tenant_id == tenant.id)
+            select(func.count(User.id)).where(User.tenant_id == tenant.id)
         )).scalar() or 0
 
         wa = (await db.execute(
@@ -225,7 +225,7 @@ async def change_tenant_plan(
         "new_plan": new_plan.value,
     })
 
-    user_count = (await db.execute(func.count(User.id).where(User.tenant_id == tenant_id))).scalar() or 0
+    user_count = (await db.execute(select(func.count(User.id)).where(User.tenant_id == tenant_id))).scalar() or 0
     wa = (await db.execute(
         select(WhatsappConnection).where(
             WhatsappConnection.tenant_id == tenant_id,
