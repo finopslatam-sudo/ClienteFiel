@@ -23,6 +23,7 @@ interface Tenant {
   user_count: number
   whatsapp_connected: boolean
   subscription: TenantSubscription | null
+  is_superadmin_tenant: boolean
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -99,7 +100,14 @@ export default function AdminTenantsPage() {
               {tenants.map((t) => (
                 <tr key={t.id} style={{ borderBottom: '1px solid rgba(6,182,212,0.06)' }}>
                   <td className="py-3 pr-4 font-medium" style={{ color: '#f1f5f9' }}>
-                    <div>{t.name}</div>
+                    <div className="flex items-center gap-2">
+                      {t.name}
+                      {t.is_superadmin_tenant && (
+                        <span className="text-xs px-1.5 py-0.5 rounded font-semibold" style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa' }}>
+                          Global
+                        </span>
+                      )}
+                    </div>
                     <div className="text-xs" style={{ color: '#475569' }}>{t.slug}</div>
                   </td>
                   <td className="py-3 pr-4">

@@ -41,6 +41,7 @@ class TenantSummary(BaseModel):
     user_count: int
     whatsapp_connected: bool
     subscription: TenantSubscriptionInfo | None
+    is_superadmin_tenant: bool = False
 
     model_config = {"from_attributes": True}
 

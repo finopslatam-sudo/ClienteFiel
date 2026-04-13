@@ -134,11 +134,6 @@ class BillingService:
         sub = result.scalar_one_or_none()
 
         if sub:
-            just_activated = (
-                new_status == TenantStatus.active
-                and sub.status != TenantStatus.active
-            )
-
             sub.status = new_status
             sub.external_subscription_id = preapproval_id
             sub.external_payer_id = str(data.get("payer_id", ""))
@@ -160,22 +155,6 @@ class BillingService:
                 "tenant_id": str(tenant_id),
                 "status": new_status.value,
             })
-
-            if just_activated and tenant:
-                billing_result = await self.db.execute(
-                    select(BillingProfile).where(BillingProfile.tenant_id == tenant_id)
-                )
-                billing = billing_result.scalar_one_or_none()
-                payer_email = (
-                    billing.person_email if billing else data.get("payer_email", "")
-                )
-                await send_subscription_notification(
-                    tenant_name=tenant.name,
-                    tenant_slug=tenant.slug,
-                    plan=sub.plan.value,
-                    payer_email=payer_email,
-                    preapproval_id=preapproval_id,
-                )
 
     async def get_subscription(self, tenant_id: uuid.UUID) -> Subscription | None:
         result = await self.db.execute(
@@ -229,6 +208,7 @@ class BillingService:
             select(BillingProfile).where(BillingProfile.tenant_id == tenant_id)
         )
         profile = result.scalar_one_or_none()
+        is_new = profile is None
 
         if profile:
             profile.document_type = document_type
@@ -259,6 +239,27 @@ class BillingService:
 
         await self.db.commit()
         await self.db.refresh(profile)
+
+        # Enviar email solo la primera vez que se guarda el perfil y la suscripción está activa
+        if is_new:
+            sub_result = await self.db.execute(
+                select(Subscription).where(Subscription.tenant_id == tenant_id)
+            )
+            sub = sub_result.scalar_one_or_none()
+            if sub and sub.status == TenantStatus.active and sub.external_subscription_id:
+                tenant_result = await self.db.execute(
+                    select(Tenant).where(Tenant.id == tenant_id)
+                )
+                tenant = tenant_result.scalar_one_or_none()
+                if tenant:
+                    await send_subscription_notification(
+                        tenant_name=tenant.name,
+                        tenant_slug=tenant.slug,
+                        plan=sub.plan.value,
+                        payer_email=profile.person_email,
+                        preapproval_id=sub.external_subscription_id,
+                    )
+
         return profile
 
     async def _upsert_subscription(

@@ -92,17 +92,16 @@ async def list_tenants(
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=50, le=200),
 ):
-    # Exclude tenants owned by superadmins
+    # Identify tenants owned by superadmins (to flag them, not exclude)
     admin_emails = (await db.execute(select(SuperAdminUser.email))).scalars().all()
-    excluded_tenant_ids: list[uuid.UUID] = []
+    superadmin_tenant_ids: set[uuid.UUID] = set()
     if admin_emails:
-        excluded_tenant_ids = (await db.execute(
+        rows = (await db.execute(
             select(User.tenant_id).where(User.email.in_(admin_emails))
         )).scalars().all()
+        superadmin_tenant_ids = set(rows)
 
     query = select(Tenant).order_by(Tenant.created_at.desc()).offset(offset).limit(limit)
-    if excluded_tenant_ids:
-        query = query.where(Tenant.id.notin_(excluded_tenant_ids))
     if search:
         query = query.where(Tenant.name.ilike(f"%{search}%"))
 
@@ -142,6 +141,7 @@ async def list_tenants(
             user_count=user_count,
             whatsapp_connected=wa is not None,
             subscription=sub_info,
+            is_superadmin_tenant=tenant.id in superadmin_tenant_ids,
         ))
 
     return result
