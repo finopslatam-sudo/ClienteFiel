@@ -43,10 +43,10 @@ export function Features() {
           className="text-center mb-12"
         >
           <motion.h2 variants={fadeInUp} className="text-3xl font-bold" style={{ color: '#f1f5f9' }}>
-            ¿Cómo funciona?
+            Todo lo que necesitas para retener clientes
           </motion.h2>
           <motion.p variants={fadeInUp} className="mt-3 text-lg" style={{ color: '#94a3b8' }}>
-            Conectas tu WhatsApp Business en 5 minutos. El resto funciona solo.
+            Una herramienta, cuatro resultados concretos.
           </motion.p>
         </motion.div>
 
