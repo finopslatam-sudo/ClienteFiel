@@ -20,6 +20,9 @@ class BookingResponse(BaseModel):
     status: BookingStatus
     created_by: BookingCreatedBy
     created_at: datetime
+    customer_name: str | None = None
+    customer_phone: str | None = None
+    service_name: str | None = None
     model_config = {"from_attributes": True}
 
 

@@ -135,6 +135,36 @@ class BookingService:
         result = await self.db.execute(query.order_by(Booking.scheduled_at))
         return list(result.scalars().all())
 
+    async def list_bookings_with_details(
+        self,
+        tenant_id: uuid.UUID,
+        status: BookingStatus | None = None,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+    ) -> list[tuple[Booking, str | None, str | None, str | None]]:
+        query = (
+            select(
+                Booking,
+                Customer.name.label("customer_name"),
+                Customer.phone_number.label("customer_phone"),
+                Service.name.label("service_name"),
+            )
+            .join(Customer, Booking.customer_id == Customer.id)
+            .join(Service, Booking.service_id == Service.id)
+            .where(Booking.tenant_id == tenant_id)
+        )
+        if status:
+            query = query.where(Booking.status == status)
+        if date_from:
+            query = query.where(Booking.scheduled_at >= date_from)
+        if date_to:
+            query = query.where(Booking.scheduled_at <= date_to)
+        result = await self.db.execute(query.order_by(Booking.scheduled_at))
+        return [
+            (row[0], row[1], row[2], row[3])
+            for row in result.all()
+        ]
+
     async def update_status(
         self, tenant_id: uuid.UUID, booking_id: uuid.UUID, new_status: BookingStatus
     ) -> Booking:

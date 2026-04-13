@@ -10,6 +10,9 @@ interface Booking {
   status: 'pending' | 'confirmed' | 'completed' | 'canceled' | 'no_show'
   created_by: 'whatsapp' | 'admin'
   created_at: string
+  customer_name: string | null
+  customer_phone: string | null
+  service_name: string | null
 }
 
 export function useBookings(dateFrom?: string, dateTo?: string) {

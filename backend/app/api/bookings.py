@@ -44,16 +44,29 @@ async def list_bookings(
     date_to: datetime | None = Query(default=None),
 ):
     service = BookingService(db)
-    bookings = await service.list_bookings(
+    rows = await service.list_bookings_with_details(
         tenant_id=current_tenant.id,
         status=status,
         date_from=date_from,
         date_to=date_to,
     )
-    return BookingListResponse(
-        bookings=[BookingResponse.model_validate(b) for b in bookings],
-        total=len(bookings),
-    )
+    bookings = [
+        BookingResponse(
+            id=b.id,
+            customer_id=b.customer_id,
+            service_id=b.service_id,
+            scheduled_at=b.scheduled_at,
+            ends_at=b.ends_at,
+            status=b.status,
+            created_by=b.created_by,
+            created_at=b.created_at,
+            customer_name=customer_name,
+            customer_phone=customer_phone,
+            service_name=service_name,
+        )
+        for b, customer_name, customer_phone, service_name in rows
+    ]
+    return BookingListResponse(bookings=bookings, total=len(bookings))
 
 
 @router.get("/{booking_id}", response_model=BookingResponse)
