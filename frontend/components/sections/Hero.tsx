@@ -49,7 +49,7 @@ export function Hero() {
                 color: '#67e8f9',
               }}
             >
-              ✅ Tus clientes ya tienen WhatsApp — úsalo
+              🟢 Más de 50 negocios chilenos ya usan Cliente Fiel
             </span>
           </motion.div>
 
@@ -58,10 +58,10 @@ export function Hero() {
             className="text-5xl md:text-6xl font-bold leading-tight mb-6"
             style={{ color: '#f1f5f9' }}
           >
-            Reservas y recordatorios{' '}
-            <span className="text-glow-cyan">automáticos</span>
+            Reservas automáticas por WhatsApp.{' '}
+            <span className="text-glow-cyan">Menos ausencias.</span>
             <br />
-            por WhatsApp
+            Más clientes que vuelven.
           </motion.h1>
 
           <motion.p
@@ -69,8 +69,8 @@ export function Hero() {
             className="text-xl max-w-2xl mx-auto mb-10"
             style={{ color: '#94a3b8' }}
           >
-            Cliente Fiel automatiza tu WhatsApp Business. Tus clientes reservan, reciben
-            recordatorios y vuelven solos — sin apps que instalar, sin formularios complicados.
+            Conectas tu WhatsApp Business una vez. Tus clientes reservan con un mensaje,
+            reciben recordatorios automáticos y vuelven solos — sin apps, sin formularios.
           </motion.p>
 
           <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -96,7 +96,7 @@ export function Hero() {
           style={{ borderTop: '1px solid rgba(6,182,212,0.1)', paddingTop: '2rem' }}
         >
           <motion.div variants={fadeInUp}>
-            <StatItem end={60} prefix="-" suffix="%" label="Menos ausencias" />
+            <StatItem end={60} prefix="-" suffix="%" label="Ausencias" />
           </motion.div>
           <motion.div
             variants={fadeInUp}
@@ -105,10 +105,10 @@ export function Hero() {
               borderRight: '1px solid rgba(6,182,212,0.15)',
             }}
           >
-            <StatItem end={2} suffix="x" label="Más retorno" />
+            <StatItem end={3} suffix="x" label="ROI promedio" />
           </motion.div>
           <motion.div variants={fadeInUp}>
-            <StatItem end={5} suffix=" min" label="Para configurar" />
+            <StatItem end={5} suffix=" min" label="Configuración" />
           </motion.div>
         </motion.div>
       </div>
