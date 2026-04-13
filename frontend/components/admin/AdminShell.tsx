@@ -33,8 +33,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
         style={{ background: 'rgba(2,11,20,0.98)', borderRight: '1px solid rgba(239,68,68,0.12)' }}
       >
         <div className="p-5" style={{ borderBottom: '1px solid rgba(239,68,68,0.1)' }}>
-          <div className="text-xs font-bold tracking-widest" style={{ color: '#ef4444' }}>ADMIN</div>
-          <div className="text-sm font-semibold mt-0.5" style={{ color: '#f1f5f9' }}>Cliente Fiel</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png?v=2" alt="Cliente Fiel" style={{ height: '48px', width: 'auto' }} />
+          <div className="text-xs font-bold tracking-widest mt-1" style={{ color: '#ef4444' }}>ADMIN</div>
         </div>
 
         <nav className="flex-1 p-3 space-y-1">
