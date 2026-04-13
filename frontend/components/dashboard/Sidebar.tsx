@@ -1,7 +1,7 @@
 // frontend/components/dashboard/Sidebar.tsx
 'use client'
 import Link from 'next/link'
-import Image from 'next/image'
+
 import { usePathname } from 'next/navigation'
 import { logout } from '@/lib/auth'
 
@@ -31,7 +31,8 @@ export function Sidebar() {
         className="p-6"
         style={{ borderBottom: '1px solid rgba(6, 182, 212, 0.08)' }}
       >
-        <Image src="/logo.png" alt="Cliente Fiel" width={120} height={40} priority />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Cliente Fiel" style={{ height: '40px', width: 'auto' }} />
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
