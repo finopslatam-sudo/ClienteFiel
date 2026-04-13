@@ -32,7 +32,7 @@ export function Sidebar() {
         style={{ borderBottom: '1px solid rgba(6, 182, 212, 0.08)' }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo_sinfondo.png" alt="Cliente Fiel" style={{ height: '56px', width: 'auto' }} />
+        <img src="/logo.png?v=2" alt="Cliente Fiel" style={{ height: '48px', width: 'auto' }} />
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
