@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.models.billing_profile import BillingProfile, DocumentType
 from app.models.subscription import Subscription, PaymentProvider
 from app.models.tenant import Tenant, TenantPlan, TenantStatus
+from app.services.email_service import send_subscription_notification
 
 logger = logging.getLogger(__name__)
 
@@ -133,6 +134,11 @@ class BillingService:
         sub = result.scalar_one_or_none()
 
         if sub:
+            just_activated = (
+                new_status == TenantStatus.active
+                and sub.status != TenantStatus.active
+            )
+
             sub.status = new_status
             sub.external_subscription_id = preapproval_id
             sub.external_payer_id = str(data.get("payer_id", ""))
@@ -154,6 +160,22 @@ class BillingService:
                 "tenant_id": str(tenant_id),
                 "status": new_status.value,
             })
+
+            if just_activated and tenant:
+                billing_result = await self.db.execute(
+                    select(BillingProfile).where(BillingProfile.tenant_id == tenant_id)
+                )
+                billing = billing_result.scalar_one_or_none()
+                payer_email = (
+                    billing.person_email if billing else data.get("payer_email", "")
+                )
+                await send_subscription_notification(
+                    tenant_name=tenant.name,
+                    tenant_slug=tenant.slug,
+                    plan=sub.plan.value,
+                    payer_email=payer_email,
+                    preapproval_id=preapproval_id,
+                )
 
     async def get_subscription(self, tenant_id: uuid.UUID) -> Subscription | None:
         result = await self.db.execute(

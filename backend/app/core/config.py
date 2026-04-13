@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     mp_access_token: str = ""
     mp_webhook_secret: str = ""
     backend_url: str = "https://api.clientefiel.riava.cl"
+    smtp_host: str = "smtp.zoho.com"
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    notification_email: str = "contacto@riava.cl"
 
     model_config = {"env_file": ".env"}
 
