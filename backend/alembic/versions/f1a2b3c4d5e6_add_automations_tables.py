@@ -47,10 +47,8 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
-    op.create_index('ix_automation_settings_tenant_id', 'automation_settings', ['tenant_id'])
-
     # Tipo enum para campaign trigger
-    op.execute("CREATE TYPE campaigntriggertype AS ENUM ('inactive_days')")
+    op.execute("CREATE TYPE IF NOT EXISTS campaigntriggertype AS ENUM ('inactive_days')")
 
     # Tabla: campaigns
     op.create_table(
@@ -74,7 +72,8 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_column('bookings', 'repurchase_sent_at')
+    op.drop_index('ix_campaigns_tenant_id', table_name='campaigns')
     op.drop_table('campaigns')
     op.execute("DROP TYPE campaigntriggertype")
-    op.drop_table('automation_settings')
+    op.drop_index('ix_custom_reminders_tenant_id', table_name='custom_reminders')
     op.drop_table('custom_reminders')
