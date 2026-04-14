@@ -1,5 +1,6 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
+import { TrialBanner } from '@/components/billing/TrialBanner'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { motion } from 'framer-motion'
@@ -88,6 +89,8 @@ export default function DashboardPage() {
 
   return (
     <div>
+      <TrialBanner />
+
       <div className="mb-8">
         <h1 className="text-2xl font-bold" style={{ color: '#f1f5f9' }}>Dashboard</h1>
         <p className="text-sm mt-1" style={{ color: '#475569' }}>

@@ -6,6 +6,15 @@ import { EmbeddedSignupButton } from '@/components/whatsapp/EmbeddedSignupButton
 
 const steps = ['Bienvenida', 'Conectar WhatsApp', 'Listo']
 
+function getRedirectAfterOnboarding(): string {
+  const pendingPlan = localStorage.getItem('pending_plan')
+  if (pendingPlan) {
+    localStorage.removeItem('pending_plan')
+    return `/suscripcion?plan=${pendingPlan}`
+  }
+  return '/agenda'
+}
+
 export default function OnboardingPage() {
   const router = useRouter()
   const [step, setStep] = useState(0)
@@ -96,7 +105,7 @@ export default function OnboardingPage() {
             )}
 
             <button
-              onClick={() => router.push('/agenda')}
+              onClick={() => router.push(getRedirectAfterOnboarding())}
               className="w-full text-center text-sm text-slate-400 hover:text-slate-600 mt-4"
             >
               Omitir por ahora (puedes conectar después)
@@ -118,7 +127,7 @@ export default function OnboardingPage() {
               recibir reservas.
             </p>
             <button
-              onClick={() => router.push('/agenda')}
+              onClick={() => router.push(getRedirectAfterOnboarding())}
               className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
             >
               Ir al dashboard →

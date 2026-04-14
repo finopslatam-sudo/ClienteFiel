@@ -1,6 +1,6 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,6 +8,8 @@ import { z } from 'zod'
 import { motion } from 'framer-motion'
 import { register as registerUser } from '@/lib/auth'
 import { fadeInUp } from '@/lib/motion'
+
+const VALID_PLANS = ['basic', 'medium', 'premium'] as const
 
 const schema = z.object({
   first_name: z.string().min(1, 'Nombre requerido'),
@@ -18,8 +20,16 @@ const schema = z.object({
 })
 type FormData = z.infer<typeof schema>
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const plan = searchParams.get('plan')
+    if (plan && (VALID_PLANS as readonly string[]).includes(plan)) {
+      localStorage.setItem('pending_plan', plan)
+    }
+  }, [searchParams])
   const [error, setError] = useState('')
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -150,5 +160,13 @@ export default function RegisterPage() {
         </Link>
       </p>
     </motion.div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterContent />
+    </Suspense>
   )
 }

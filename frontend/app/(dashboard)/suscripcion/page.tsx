@@ -1,8 +1,9 @@
 // frontend/app/(dashboard)/suscripcion/page.tsx
 'use client'
-import { useState, useEffect } from 'react'
-import { Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { format, parseISO } from 'date-fns'
+import { es } from 'date-fns/locale'
 import api from '@/lib/api'
 import { DocumentPreferenceModal } from '@/components/billing/DocumentPreferenceModal'
 
@@ -11,6 +12,7 @@ interface SubscriptionStatus {
   status: string
   provider: string
   external_subscription_id: string | null
+  trial_ends_at: string | null
 }
 
 const PLAN_LABELS: Record<string, string> = {
@@ -79,10 +81,25 @@ function SuscripcionContent() {
   const [canceling, setCanceling] = useState(false)
   const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const [highlightedPlan, setHighlightedPlan] = useState<string | null>(null)
+  const planRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   useEffect(() => {
     if (searchParams.get('subscribed') === 'true') {
       setShowModal(true)
+    }
+  }, [searchParams])
+
+  // Resaltar plan pre-seleccionado desde URL
+  useEffect(() => {
+    const planParam = searchParams.get('plan')
+    if (planParam && plans.some(p => p.key === planParam)) {
+      setHighlightedPlan(planParam)
+      setTimeout(() => {
+        planRefs.current[planParam]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 200)
+      const timer = setTimeout(() => setHighlightedPlan(null), 2200)
+      return () => clearTimeout(timer)
     }
   }, [searchParams])
 
@@ -146,48 +163,58 @@ function SuscripcionContent() {
       {/* Estado actual */}
       {!loading && subscription && (
         <div
-          className="glass-card p-5 mb-8 flex items-center justify-between"
+          className="glass-card p-5 mb-8"
           style={{ border: '1px solid rgba(6,182,212,0.15)' }}
         >
-          <div className="flex items-center gap-4">
-            <div>
-              <div className="text-xs mb-1" style={{ color: '#64748b' }}>Plan actual</div>
-              <div className="font-semibold" style={{ color: '#f1f5f9' }}>
-                {PLAN_LABELS[subscription.plan] ?? subscription.plan}
-              </div>
-            </div>
-            <div
-              className="w-px h-8"
-              style={{ background: 'rgba(6,182,212,0.15)' }}
-            />
-            <div>
-              <div className="text-xs mb-1" style={{ color: '#64748b' }}>Estado</div>
-              <div className="font-semibold text-sm" style={{ color: statusInfo?.color ?? '#94a3b8' }}>
-                {statusInfo?.label ?? subscription.status}
-              </div>
-            </div>
-            {subscription.provider !== 'none' && (
-              <>
-                <div className="w-px h-8" style={{ background: 'rgba(6,182,212,0.15)' }} />
-                <div>
-                  <div className="text-xs mb-1" style={{ color: '#64748b' }}>Proveedor</div>
-                  <div className="text-sm capitalize" style={{ color: '#94a3b8' }}>
-                    {subscription.provider === 'mercadopago' ? 'Mercado Pago' : subscription.provider}
-                  </div>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div>
+                <div className="text-xs mb-1" style={{ color: '#64748b' }}>Plan actual</div>
+                <div className="font-semibold" style={{ color: '#f1f5f9' }}>
+                  {PLAN_LABELS[subscription.plan] ?? subscription.plan}
                 </div>
-              </>
+              </div>
+              <div className="w-px h-8 hidden sm:block" style={{ background: 'rgba(6,182,212,0.15)' }} />
+              <div>
+                <div className="text-xs mb-1" style={{ color: '#64748b' }}>Estado</div>
+                <div className="font-semibold text-sm" style={{ color: statusInfo?.color ?? '#94a3b8' }}>
+                  {statusInfo?.label ?? subscription.status}
+                </div>
+              </div>
+              {subscription.status === 'trial' && subscription.trial_ends_at && (
+                <>
+                  <div className="w-px h-8 hidden sm:block" style={{ background: 'rgba(6,182,212,0.15)' }} />
+                  <div>
+                    <div className="text-xs mb-1" style={{ color: '#64748b' }}>Tu prueba gratis termina</div>
+                    <div className="text-sm font-medium" style={{ color: '#f59e0b' }}>
+                      {format(parseISO(subscription.trial_ends_at), "d 'de' MMMM 'de' yyyy", { locale: es })}
+                    </div>
+                  </div>
+                </>
+              )}
+              {subscription.provider !== 'none' && (
+                <>
+                  <div className="w-px h-8 hidden sm:block" style={{ background: 'rgba(6,182,212,0.15)' }} />
+                  <div>
+                    <div className="text-xs mb-1" style={{ color: '#64748b' }}>Proveedor</div>
+                    <div className="text-sm capitalize" style={{ color: '#94a3b8' }}>
+                      {subscription.provider === 'mercadopago' ? 'Mercado Pago' : subscription.provider}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            {isActive && (
+              <button
+                onClick={handleCancel}
+                disabled={canceling}
+                className="text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}
+              >
+                {canceling ? 'Cancelando...' : 'Cancelar suscripción'}
+              </button>
             )}
           </div>
-          {isActive && (
-            <button
-              onClick={handleCancel}
-              disabled={canceling}
-              className="text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-              style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}
-            >
-              {canceling ? 'Cancelando...' : 'Cancelar suscripción'}
-            </button>
-          )}
         </div>
       )}
 
@@ -201,15 +228,24 @@ function SuscripcionContent() {
       <div className="grid md:grid-cols-3 gap-6">
         {plans.map((plan) => {
           const isCurrent = subscription?.plan === plan.key && isActive
+          const isHighlighted = highlightedPlan === plan.key
           return (
             <div
               key={plan.key}
-              className="glass-card p-6 flex flex-col"
-              style={
-                plan.highlighted
-                  ? { border: '1px solid rgba(6,182,212,0.4)', boxShadow: '0 0 30px rgba(6,182,212,0.08)' }
-                  : undefined
-              }
+              ref={el => { planRefs.current[plan.key] = el }}
+              className="glass-card p-6 flex flex-col transition-all duration-300"
+              style={{
+                border: isHighlighted
+                  ? '2px solid #06b6d4'
+                  : plan.highlighted
+                  ? '1px solid rgba(6,182,212,0.4)'
+                  : '1px solid rgba(6,182,212,0.08)',
+                boxShadow: isHighlighted
+                  ? '0 0 0 2px #06b6d4, 0 0 30px rgba(6,182,212,0.2)'
+                  : plan.highlighted
+                  ? '0 0 30px rgba(6,182,212,0.08)'
+                  : 'none',
+              }}
             >
               {plan.highlighted && (
                 <span
@@ -249,7 +285,7 @@ function SuscripcionContent() {
                     plan.highlighted ? 'btn-cyan' : 'btn-ghost-cyan'
                   }`}
                 >
-                  {subscribing === plan.key ? 'Redirigiendo...' : `Suscribirse con Mercado Pago`}
+                  {subscribing === plan.key ? 'Redirigiendo...' : 'Suscribirse con Mercado Pago'}
                 </button>
               )}
             </div>
