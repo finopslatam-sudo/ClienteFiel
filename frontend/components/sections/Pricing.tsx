@@ -70,6 +70,13 @@ export function Pricing() {
           <motion.p variants={fadeInUp} className="mt-3 text-lg" style={{ color: '#94a3b8' }}>
             14 días gratis · Suscripción mensual con tarjeta · Cancela cuando quieras
           </motion.p>
+          <motion.p
+            variants={fadeInUp}
+            className="mt-4 text-sm font-medium"
+            style={{ color: '#64748b' }}
+          >
+            Una secretaria cuesta $400.000/mes. Cliente Fiel desde $3.000.
+          </motion.p>
         </motion.div>
 
         <motion.div
@@ -130,6 +137,17 @@ export function Pricing() {
             </motion.div>
           ))}
         </motion.div>
+
+        <motion.p
+          variants={fadeInUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="text-center text-sm mt-8"
+          style={{ color: '#475569' }}
+        >
+          🔒 14 días gratis · Sin tarjeta · Cancela cuando quieras · Soporte por WhatsApp
+        </motion.p>
       </div>
     </section>
   )

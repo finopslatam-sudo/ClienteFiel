@@ -25,6 +25,14 @@ const faqs = [
     q: '¿Para qué tipos de negocio sirve?',
     a: 'Peluquerías, spas, consultorios, restaurantes, talleres — cualquier negocio que atienda clientes con citas o reservas.',
   },
+  {
+    q: '¿Es seguro conectar mi WhatsApp Business?',
+    a: 'Sí. Tus credenciales se guardan cifradas y solo se usan para enviar mensajes en tu nombre. Nunca compartimos tu número con otros negocios ni con terceros.',
+  },
+  {
+    q: '¿Cuánto cuesta realmente? ¿Hay costos ocultos?',
+    a: 'Solo pagas el plan mensual. Sin costo de instalación, sin comisiones por reserva, sin cobros por mensaje. Lo que ves en los planes es lo que pagas.',
+  },
 ]
 
 export function FAQ() {

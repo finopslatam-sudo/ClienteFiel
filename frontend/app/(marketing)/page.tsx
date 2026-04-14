@@ -1,9 +1,13 @@
 // frontend/app/(marketing)/page.tsx
 import Script from 'next/script'
 import { Hero } from '@/components/sections/Hero'
+import { HowItWorks } from '@/components/sections/HowItWorks'
 import { Features } from '@/components/sections/Features'
+import { ForBusinesses } from '@/components/sections/ForBusinesses'
+import { SocialProof } from '@/components/sections/SocialProof'
 import { Pricing } from '@/components/sections/Pricing'
 import { FAQ } from '@/components/sections/FAQ'
+import { FinalCTA } from '@/components/sections/FinalCTA'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -36,9 +40,13 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Hero />
+      <HowItWorks />
       <Features />
+      <ForBusinesses />
+      <SocialProof />
       <Pricing />
       <FAQ />
+      <FinalCTA />
     </>
   )
 }
