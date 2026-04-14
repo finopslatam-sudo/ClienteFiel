@@ -61,7 +61,7 @@ const plans = [
       { text: 'Confirmación automática inmediata', included: true },
       { text: 'Recordatorios: confirmación + 24h + 1h', included: true },
       { text: 'Recordatorios personalizados por servicio', included: true },
-      { text: 'Recompra automática post-visita', included: true },
+      { text: 'Recompra automática post-visita', included: false },
       { text: 'Sistema de puntos y recompensas', included: false },
       { text: 'Campañas automáticas de retención', included: false },
       { text: 'Métricas: retorno, recurrencia, LTV', included: false },
