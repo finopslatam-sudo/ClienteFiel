@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/api'
 
-interface Booking {
+export interface Booking {
   id: string
   customer_id: string
   service_id: string
