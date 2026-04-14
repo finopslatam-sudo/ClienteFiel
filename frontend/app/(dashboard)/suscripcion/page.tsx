@@ -35,11 +35,17 @@ const plans = [
     priceCLP: '$3.000',
     priceUSD: 'USD 3',
     subtitle: 'Agenda Automatizada',
+    accentColor: '#06b6d4',
     features: [
-      'Reservas vía WhatsApp',
-      'Configuración de horarios',
-      'Confirmación automática inmediata',
-      'Recordatorios: confirmación + 24h + 1h',
+      { text: 'Reservas vía WhatsApp', included: true },
+      { text: 'Configuración de horarios', included: true },
+      { text: 'Confirmación automática inmediata', included: true },
+      { text: 'Recordatorios: confirmación + 24h + 1h', included: true },
+      { text: 'Recordatorios personalizados por servicio', included: false },
+      { text: 'Recompra automática post-visita', included: false },
+      { text: 'Sistema de puntos y recompensas', included: false },
+      { text: 'Campañas automáticas de retención', included: false },
+      { text: 'Métricas: retorno, recurrencia, LTV', included: false },
     ],
   },
   {
@@ -48,11 +54,17 @@ const plans = [
     priceCLP: '$40.000',
     priceUSD: 'USD 42',
     subtitle: 'Recompra Inteligente',
+    accentColor: '#06b6d4',
     features: [
-      'Todo el Plan Básico',
-      'Recordatorios personalizados por servicio',
-      'Configuración de recurrencia por cliente',
-      'Mensaje automático de recompra post-visita',
+      { text: 'Reservas vía WhatsApp', included: true },
+      { text: 'Configuración de horarios', included: true },
+      { text: 'Confirmación automática inmediata', included: true },
+      { text: 'Recordatorios: confirmación + 24h + 1h', included: true },
+      { text: 'Recordatorios personalizados por servicio', included: true },
+      { text: 'Recompra automática post-visita', included: true },
+      { text: 'Sistema de puntos y recompensas', included: false },
+      { text: 'Campañas automáticas de retención', included: false },
+      { text: 'Métricas: retorno, recurrencia, LTV', included: false },
     ],
     highlighted: true,
   },
@@ -62,12 +74,17 @@ const plans = [
     priceCLP: '$60.000',
     priceUSD: 'USD 62',
     subtitle: 'Fidelización + Retención',
+    accentColor: '#a78bfa',
     features: [
-      'Todo el Plan Medio',
-      'Sistema de puntos y recompensas',
-      'Segmentación de clientes y VIP',
-      'Campañas automáticas ("Te extrañamos")',
-      'Métricas: retorno, recurrencia, LTV',
+      { text: 'Reservas vía WhatsApp', included: true },
+      { text: 'Configuración de horarios', included: true },
+      { text: 'Confirmación automática inmediata', included: true },
+      { text: 'Recordatorios: confirmación + 24h + 1h', included: true },
+      { text: 'Recordatorios personalizados por servicio', included: true },
+      { text: 'Recompra automática post-visita', included: true },
+      { text: 'Sistema de puntos y recompensas', included: true },
+      { text: 'Campañas automáticas de retención', included: true },
+      { text: 'Métricas: retorno, recurrencia, LTV', included: true },
     ],
   },
 ]
@@ -229,6 +246,8 @@ function SuscripcionContent() {
         {plans.map((plan) => {
           const isCurrent = subscription?.plan === plan.key && isActive
           const isHighlighted = highlightedPlan === plan.key
+          const isPremium = plan.key === 'premium'
+          const borderColor = isPremium ? plan.accentColor : '#06b6d4'
           return (
             <div
               key={plan.key}
@@ -236,18 +255,30 @@ function SuscripcionContent() {
               className="glass-card p-6 flex flex-col transition-all duration-300"
               style={{
                 border: isHighlighted
-                  ? '2px solid #06b6d4'
+                  ? `2px solid ${borderColor}`
+                  : isPremium
+                  ? `1px solid rgba(167,139,250,0.35)`
                   : plan.highlighted
                   ? '1px solid rgba(6,182,212,0.4)'
                   : '1px solid rgba(6,182,212,0.08)',
                 boxShadow: isHighlighted
-                  ? '0 0 0 2px #06b6d4, 0 0 30px rgba(6,182,212,0.2)'
+                  ? `0 0 0 2px ${borderColor}, 0 0 30px ${borderColor}33`
+                  : isPremium
+                  ? '0 0 30px rgba(167,139,250,0.08)'
                   : plan.highlighted
                   ? '0 0 30px rgba(6,182,212,0.08)'
                   : 'none',
               }}
             >
-              {plan.highlighted && (
+              {isPremium && (
+                <span
+                  className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-4 self-start"
+                  style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa', border: '1px solid rgba(167,139,250,0.3)' }}
+                >
+                  COMPLETO
+                </span>
+              )}
+              {plan.highlighted && !isPremium && (
                 <span
                   className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-4 self-start"
                   style={{ background: '#06b6d4', color: '#020b14' }}
@@ -255,7 +286,7 @@ function SuscripcionContent() {
                   MÁS POPULAR
                 </span>
               )}
-              <div className="text-3xl font-bold" style={{ color: '#f1f5f9' }}>
+              <div className="text-3xl font-bold" style={{ color: isPremium ? '#a78bfa' : '#f1f5f9' }}>
                 {plan.priceCLP}
                 <span className="text-sm font-normal" style={{ color: '#94a3b8' }}> CLP/mes</span>
               </div>
@@ -264,9 +295,11 @@ function SuscripcionContent() {
               <div className="text-sm mb-5" style={{ color: '#94a3b8' }}>{plan.subtitle}</div>
               <ul className="space-y-2 mb-6 flex-1">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm" style={{ color: '#94a3b8' }}>
-                    <span style={{ color: '#10b981', marginTop: '2px' }}>✓</span>
-                    {f}
+                  <li key={f.text} className="flex items-start gap-2 text-sm" style={{ color: f.included ? '#94a3b8' : '#334155' }}>
+                    <span style={{ color: f.included ? (isPremium ? '#a78bfa' : '#10b981') : '#334155', marginTop: '2px', flexShrink: 0 }}>
+                      {f.included ? '✓' : '✕'}
+                    </span>
+                    {f.text}
                   </li>
                 ))}
               </ul>
@@ -282,8 +315,13 @@ function SuscripcionContent() {
                   onClick={() => handleSubscribe(plan.key)}
                   disabled={!!subscribing}
                   className={`py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-50 ${
-                    plan.highlighted ? 'btn-cyan' : 'btn-ghost-cyan'
+                    isPremium ? '' : plan.highlighted ? 'btn-cyan' : 'btn-ghost-cyan'
                   }`}
+                  style={isPremium ? {
+                    background: 'rgba(167,139,250,0.15)',
+                    border: '1px solid rgba(167,139,250,0.4)',
+                    color: '#a78bfa',
+                  } : undefined}
                 >
                   {subscribing === plan.key ? 'Redirigiendo...' : 'Suscribirse con Mercado Pago'}
                 </button>
