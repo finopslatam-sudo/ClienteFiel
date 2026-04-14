@@ -4,12 +4,14 @@ import { motion } from 'framer-motion'
 import { format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { fadeInUp } from '@/lib/motion'
+import type { Booking } from '@/lib/hooks/useBookings'
 
 const statusStyle: Record<string, string> = {
   confirmed: '#10b981',
   canceled: '#ef4444',
   completed: '#94a3b8',
   pending: '#f59e0b',
+  no_show: '#94a3b8',
 }
 
 const statusLabel: Record<string, string> = {
@@ -20,14 +22,10 @@ const statusLabel: Record<string, string> = {
   no_show: 'No asistió',
 }
 
-export interface BookingCardData {
-  id: string
-  scheduled_at: string
-  status: string
-  customer_name: string | null
-  customer_phone: string | null
-  service_name: string | null
-}
+export type BookingCardData = Pick<
+  Booking,
+  'id' | 'scheduled_at' | 'status' | 'customer_name' | 'customer_phone' | 'service_name'
+>
 
 interface BookingCardProps {
   booking: BookingCardData
