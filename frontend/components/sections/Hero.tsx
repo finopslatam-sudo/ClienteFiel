@@ -32,130 +32,131 @@ export function Hero() {
     const v = videoRef.current
     if (!v) return
     v.muted = true
-    // Seek slightly past frame 0 in case the first frame is dark
     v.currentTime = 0.5
     v.play().catch(() => {/* autoplay blocked */})
   }, [])
 
   return (
     <section className="relative w-full overflow-hidden" style={{ background: '#020b14' }}>
-      {/* Background video */}
-      <video
-        ref={videoRef}
-        src="/videocitas.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          opacity: 0.65,
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
-
-      {/* Dark gradient overlay to keep text crisp */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          zIndex: 1,
-          background:
-            'linear-gradient(to bottom, rgba(2,11,20,0.35) 0%, rgba(2,11,20,0.10) 40%, rgba(2,11,20,0.55) 100%)',
-        }}
-      />
-
       {/* Cyber Grid */}
-      <div className="absolute inset-0 cyber-grid pointer-events-none" style={{ zIndex: 2 }} />
-      {/* Radial glow top-center */}
+      <div className="absolute inset-0 cyber-grid pointer-events-none" style={{ zIndex: 0 }} />
+      {/* Radial glow top-left */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          zIndex: 2,
+          zIndex: 0,
           background:
-            'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(6,182,212,0.15) 0%, transparent 70%)',
+            'radial-gradient(ellipse 60% 60% at 20% 50%, rgba(6,182,212,0.08) 0%, transparent 70%)',
         }}
       />
 
-      <div className="relative max-w-6xl mx-auto px-4 pt-24 pb-20 text-center" style={{ zIndex: 3 }}>
-        <motion.div variants={staggerContainer} initial="hidden" animate="visible">
-          <motion.div variants={fadeInUp}>
-            <span
-              className="inline-block text-sm font-medium px-4 py-1.5 rounded-full mb-6"
-              style={{
-                background: 'rgba(6,182,212,0.08)',
-                border: '1px solid rgba(6,182,212,0.25)',
-                color: '#67e8f9',
-              }}
+      <div className="relative max-w-6xl mx-auto px-4 pt-24 pb-20" style={{ zIndex: 1 }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+          {/* ── Left: text content ── */}
+          <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+            <motion.div variants={fadeInUp}>
+              <span
+                className="inline-block text-sm font-medium px-4 py-1.5 rounded-full mb-6"
+                style={{
+                  background: 'rgba(6,182,212,0.08)',
+                  border: '1px solid rgba(6,182,212,0.25)',
+                  color: '#67e8f9',
+                }}
+              >
+                🟢 Más de 50 negocios chilenos ya usan Cliente Fiel
+              </span>
+            </motion.div>
+
+            <motion.h1
+              variants={fadeInUp}
+              className="text-4xl md:text-5xl font-bold leading-tight mb-6"
+              style={{ color: '#f1f5f9' }}
             >
-              🟢 Más de 50 negocios chilenos ya usan Cliente Fiel
-            </span>
+              Reservas automáticas por WhatsApp.{' '}
+              <span className="text-glow-cyan">Menos ausencias.</span>
+              <br />
+              Más clientes que vuelven.
+            </motion.h1>
+
+            <motion.p
+              variants={fadeInUp}
+              className="text-lg mb-10"
+              style={{ color: '#94a3b8' }}
+            >
+              Conectas tu WhatsApp Business una vez. Tus clientes reservan con un mensaje,
+              reciben recordatorios automáticos y vuelven solos — sin apps, sin formularios.
+            </motion.p>
+
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4">
+              <Link href="/registro" className="btn-cyan px-8 py-4 rounded-xl text-lg">
+                Prueba gratis 14 días →
+              </Link>
+              <Link href="/precios" className="btn-ghost-cyan px-8 py-4 rounded-xl text-lg font-semibold">
+                Ver planes
+              </Link>
+            </motion.div>
+
+            <motion.p variants={fadeInUp} className="text-sm mt-4" style={{ color: '#475569' }}>
+              Sin tarjeta hasta el día 14 · Cancela cuando quieras · Configura en 5 minutos
+            </motion.p>
+
+            {/* Stats */}
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="mt-12 grid grid-cols-3 max-w-sm"
+              style={{ borderTop: '1px solid rgba(6,182,212,0.1)', paddingTop: '1.5rem' }}
+            >
+              <motion.div variants={fadeInUp}>
+                <StatItem end={60} prefix="-" suffix="%" label="Ausencias" />
+              </motion.div>
+              <motion.div
+                variants={fadeInUp}
+                style={{
+                  borderLeft: '1px solid rgba(6,182,212,0.15)',
+                  borderRight: '1px solid rgba(6,182,212,0.15)',
+                }}
+              >
+                <StatItem end={3} suffix="x" label="ROI promedio" />
+              </motion.div>
+              <motion.div variants={fadeInUp}>
+                <StatItem end={5} suffix=" min" label="Configuración" />
+              </motion.div>
+            </motion.div>
           </motion.div>
 
-          <motion.h1
-            variants={fadeInUp}
-            className="text-5xl md:text-6xl font-bold leading-tight mb-6"
-            style={{ color: '#f1f5f9' }}
-          >
-            Reservas automáticas por WhatsApp.{' '}
-            <span className="text-glow-cyan">Menos ausencias.</span>
-            <br />
-            Más clientes que vuelven.
-          </motion.h1>
-
-          <motion.p
-            variants={fadeInUp}
-            className="text-xl max-w-2xl mx-auto mb-10"
-            style={{ color: '#94a3b8' }}
-          >
-            Conectas tu WhatsApp Business una vez. Tus clientes reservan con un mensaje,
-            reciben recordatorios automáticos y vuelven solos — sin apps, sin formularios.
-          </motion.p>
-
-          <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/registro" className="btn-cyan px-8 py-4 rounded-xl text-lg">
-              Prueba gratis 14 días →
-            </Link>
-            <Link href="/precios" className="btn-ghost-cyan px-8 py-4 rounded-xl text-lg font-semibold">
-              Ver planes
-            </Link>
-          </motion.div>
-
-          <motion.p variants={fadeInUp} className="text-sm mt-4" style={{ color: '#475569' }}>
-            Sin tarjeta hasta el día 14 · Cancela cuando quieras · Configura en 5 minutos
-          </motion.p>
-        </motion.div>
-
-        {/* Stats with CountUp */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="mt-16 grid grid-cols-3 max-w-lg mx-auto"
-          style={{ borderTop: '1px solid rgba(6,182,212,0.1)', paddingTop: '2rem' }}
-        >
-          <motion.div variants={fadeInUp}>
-            <StatItem end={60} prefix="-" suffix="%" label="Ausencias" />
-          </motion.div>
+          {/* ── Right: video ── */}
           <motion.div
             variants={fadeInUp}
-            style={{
-              borderLeft: '1px solid rgba(6,182,212,0.15)',
-              borderRight: '1px solid rgba(6,182,212,0.15)',
-            }}
+            initial="hidden"
+            animate="visible"
+            className="hidden lg:block"
           >
-            <StatItem end={3} suffix="x" label="ROI promedio" />
+            <div
+              style={{
+                borderRadius: '14px',
+                overflow: 'hidden',
+                border: '1px solid rgba(6,182,212,0.25)',
+                boxShadow:
+                  '0 0 0 1px rgba(6,182,212,0.06), 0 0 60px rgba(6,182,212,0.15), 0 24px 48px rgba(0,0,0,0.5)',
+              }}
+            >
+              <video
+                ref={videoRef}
+                src="/videocitas.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                style={{ width: '100%', display: 'block' }}
+              />
+            </div>
           </motion.div>
-          <motion.div variants={fadeInUp}>
-            <StatItem end={5} suffix=" min" label="Configuración" />
-          </motion.div>
-        </motion.div>
+
+        </div>
       </div>
     </section>
   )
