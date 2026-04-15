@@ -40,7 +40,7 @@ export function Hero() {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          opacity: 0.18,
+          opacity: 0.38,
           pointerEvents: 'none',
         }}
       >
@@ -52,7 +52,7 @@ export function Hero() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'linear-gradient(to bottom, rgba(2,11,20,0.65) 0%, rgba(2,11,20,0.45) 40%, rgba(2,11,20,0.80) 100%)',
+            'linear-gradient(to bottom, rgba(2,11,20,0.55) 0%, rgba(2,11,20,0.30) 40%, rgba(2,11,20,0.70) 100%)',
         }}
       />
 
