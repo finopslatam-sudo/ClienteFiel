@@ -32,7 +32,9 @@ export function Hero() {
     const v = videoRef.current
     if (!v) return
     v.muted = true
-    v.play().catch(() => {/* autoplay blocked — video stays hidden */})
+    // Seek slightly past frame 0 in case the first frame is dark
+    v.currentTime = 0.5
+    v.play().catch(() => {/* autoplay blocked */})
   }, [])
 
   return (
@@ -53,7 +55,7 @@ export function Hero() {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          opacity: 0.38,
+          opacity: 0.65,
           pointerEvents: 'none',
           zIndex: 0,
         }}
@@ -65,7 +67,7 @@ export function Hero() {
         style={{
           zIndex: 1,
           background:
-            'linear-gradient(to bottom, rgba(2,11,20,0.55) 0%, rgba(2,11,20,0.30) 40%, rgba(2,11,20,0.70) 100%)',
+            'linear-gradient(to bottom, rgba(2,11,20,0.35) 0%, rgba(2,11,20,0.10) 40%, rgba(2,11,20,0.55) 100%)',
         }}
       />
 
