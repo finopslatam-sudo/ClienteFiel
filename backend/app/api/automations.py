@@ -202,10 +202,17 @@ async def _get_or_create_settings(tenant_id: uuid.UUID, db: AsyncSession) -> Aut
     )
     settings = result.scalar_one_or_none()
     if not settings:
-        settings = AutomationSettings(tenant_id=tenant_id)
-        db.add(settings)
-        await db.commit()
-        await db.refresh(settings)
+        try:
+            settings = AutomationSettings(tenant_id=tenant_id)
+            db.add(settings)
+            await db.commit()
+            await db.refresh(settings)
+        except Exception:
+            await db.rollback()
+            result = await db.execute(
+                select(AutomationSettings).where(AutomationSettings.tenant_id == tenant_id)
+            )
+            settings = result.scalar_one_or_none()
     return settings
 
 
