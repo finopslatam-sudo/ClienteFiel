@@ -2,7 +2,6 @@
 import Script from 'next/script'
 import { Hero } from '@/components/sections/Hero'
 import { HowItWorks } from '@/components/sections/HowItWorks'
-import { VideoDemo } from '@/components/sections/VideoDemo'
 import { Features } from '@/components/sections/Features'
 import { ForBusinesses } from '@/components/sections/ForBusinesses'
 import { SocialProof } from '@/components/sections/SocialProof'
@@ -42,7 +41,6 @@ export default function HomePage() {
       />
       <Hero />
       <HowItWorks />
-      <VideoDemo />
       <Features />
       <ForBusinesses />
       <SocialProof />

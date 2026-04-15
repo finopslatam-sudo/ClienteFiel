@@ -27,6 +27,35 @@ function StatItem({ end, suffix, prefix = '', label }: StatItemProps) {
 export function Hero() {
   return (
     <section className="relative w-full overflow-hidden" style={{ background: '#020b14' }}>
+      {/* Background video */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: 0.18,
+          pointerEvents: 'none',
+        }}
+      >
+        <source src="/videocitas.mp4" type="video/mp4" />
+      </video>
+
+      {/* Dark gradient overlay to keep text crisp */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'linear-gradient(to bottom, rgba(2,11,20,0.65) 0%, rgba(2,11,20,0.45) 40%, rgba(2,11,20,0.80) 100%)',
+        }}
+      />
+
       {/* Cyber Grid */}
       <div className="absolute inset-0 cyber-grid pointer-events-none" />
       {/* Radial glow top-center */}
