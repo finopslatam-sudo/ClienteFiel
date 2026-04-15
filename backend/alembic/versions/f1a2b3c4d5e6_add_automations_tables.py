@@ -63,7 +63,7 @@ def upgrade() -> None:
         sa.Column('tenant_id', UUID(as_uuid=True), sa.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False),
         sa.Column('name', sa.String(100), nullable=False),
         sa.Column('message_text', sa.Text(), nullable=False),
-        sa.Column('trigger_type', sa.Enum('inactive_days', name='campaigntriggertype'), nullable=False),
+        sa.Column('trigger_type', sa.Enum('inactive_days', name='campaigntriggertype', create_type=False), nullable=False),
         sa.Column('trigger_value', sa.Integer(), nullable=False),
         sa.Column('active', sa.Boolean(), nullable=False, server_default='false'),
         sa.Column('last_run_at', sa.DateTime(), nullable=True),
