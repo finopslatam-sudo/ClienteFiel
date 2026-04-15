@@ -6,7 +6,7 @@ celery_app = Celery(
     "clientefiel",
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
-    include=["app.tasks.reminders"],
+    include=["app.tasks.reminders", "app.tasks.automations"],
 )
 
 celery_app.conf.update(
@@ -17,4 +17,10 @@ celery_app.conf.update(
     enable_utc=True,
     task_acks_late=True,
     task_reject_on_worker_lost=True,
+    beat_schedule={
+        "run-retention-campaigns-daily": {
+            "task": "app.tasks.automations.run_retention_campaigns",
+            "schedule": 86400.0,  # cada 24 horas
+        },
+    },
 )

@@ -241,3 +241,38 @@ async def test_delete_reminder(client: AsyncClient, db_session):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert len(r3.json()) == 0
+
+
+@pytest.mark.asyncio
+async def test_send_repurchase_skips_if_already_sent():
+    """Si repurchase_sent_at ya está seteado, no envía."""
+    from unittest.mock import patch, MagicMock, AsyncMock
+    from app.tasks.automations import _send_repurchase_async
+
+    with patch("app.tasks.automations.get_booking_with_tenant", new_callable=AsyncMock) as mock_get:
+        mock_booking = MagicMock()
+        mock_booking.repurchase_sent_at = "2026-01-01"  # ya enviado
+        mock_get.return_value = mock_booking
+        with patch("app.tasks.automations.send_whatsapp_message", new_callable=AsyncMock) as mock_send:
+            task_mock = MagicMock()
+            await _send_repurchase_async(task_mock, "00000000-0000-0000-0000-000000000001")
+            mock_send.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_send_repurchase_skips_if_settings_disabled():
+    """Si repurchase_enabled=False, no envía."""
+    from unittest.mock import patch, MagicMock, AsyncMock
+    from app.tasks.automations import _send_repurchase_async
+
+    with patch("app.tasks.automations.get_booking_with_tenant", new_callable=AsyncMock) as mock_get:
+        mock_booking = MagicMock()
+        mock_booking.repurchase_sent_at = None
+        mock_get.return_value = mock_booking
+
+        with patch("app.tasks.automations.get_automation_settings", new_callable=AsyncMock) as mock_settings:
+            mock_settings.return_value = None  # sin settings = disabled
+            with patch("app.tasks.automations.send_whatsapp_message", new_callable=AsyncMock) as mock_send:
+                task_mock = MagicMock()
+                await _send_repurchase_async(task_mock, "00000000-0000-0000-0000-000000000001")
+                mock_send.assert_not_called()
