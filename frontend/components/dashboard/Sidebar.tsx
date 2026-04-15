@@ -9,6 +9,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/agenda', label: 'Agenda', icon: '📅' },
   { href: '/clientes', label: 'Clientes', icon: '👥' },
+  { href: '/automatizaciones', label: 'Automatizaciones', icon: '⚡' },
   { href: '/configuracion', label: 'Configuración', icon: '⚙️' },
   { href: '/cuenta', label: 'Cuenta', icon: '👤' },
   { href: '/whatsapp', label: 'WhatsApp', icon: '💬' },
