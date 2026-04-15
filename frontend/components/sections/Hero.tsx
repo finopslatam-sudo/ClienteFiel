@@ -1,5 +1,6 @@
 // frontend/components/sections/Hero.tsx
 'use client'
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
@@ -25,49 +26,62 @@ function StatItem({ end, suffix, prefix = '', label }: StatItemProps) {
 }
 
 export function Hero() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    v.muted = true
+    v.play().catch(() => {/* autoplay blocked — video stays hidden */})
+  }, [])
+
   return (
     <section className="relative w-full overflow-hidden" style={{ background: '#020b14' }}>
       {/* Background video */}
       <video
+        ref={videoRef}
+        src="/videocitas.mp4"
         autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         style={{
           position: 'absolute',
-          inset: 0,
+          top: 0,
+          left: 0,
           width: '100%',
           height: '100%',
           objectFit: 'cover',
           opacity: 0.38,
           pointerEvents: 'none',
+          zIndex: 0,
         }}
-      >
-        <source src="/videocitas.mp4" type="video/mp4" />
-      </video>
+      />
 
       {/* Dark gradient overlay to keep text crisp */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
+          zIndex: 1,
           background:
             'linear-gradient(to bottom, rgba(2,11,20,0.55) 0%, rgba(2,11,20,0.30) 40%, rgba(2,11,20,0.70) 100%)',
         }}
       />
 
       {/* Cyber Grid */}
-      <div className="absolute inset-0 cyber-grid pointer-events-none" />
+      <div className="absolute inset-0 cyber-grid pointer-events-none" style={{ zIndex: 2 }} />
       {/* Radial glow top-center */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
+          zIndex: 2,
           background:
             'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(6,182,212,0.15) 0%, transparent 70%)',
         }}
       />
 
-      <div className="relative max-w-6xl mx-auto px-4 pt-24 pb-20 text-center">
+      <div className="relative max-w-6xl mx-auto px-4 pt-24 pb-20 text-center" style={{ zIndex: 3 }}>
         <motion.div variants={staggerContainer} initial="hidden" animate="visible">
           <motion.div variants={fadeInUp}>
             <span
