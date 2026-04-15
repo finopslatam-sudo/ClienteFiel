@@ -276,6 +276,127 @@ async def test_send_repurchase_skips_if_settings_disabled():
 
 
 @pytest.mark.asyncio
+async def test_update_settings_premium_success(client: AsyncClient):
+    """PUT /settings con plan premium actualiza los campos correctamente."""
+    token = await register_and_login(client, "updset@test.com", "UpdSet Negocio")
+    # Tenants nuevos son premium por default en trial
+
+    r = await client.put(
+        "/api/v1/automations/settings",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "repurchase_enabled": True,
+            "repurchase_days_after": 14,
+            "repurchase_message": "Hola {nombre}, te esperamos en {negocio}",
+            "points_enabled": True,
+            "points_per_visit": 20,
+            "points_redeem_threshold": 200,
+            "points_reward_description": "Descuento 10%",
+        },
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data["repurchase_enabled"] is True
+    assert data["repurchase_days_after"] == 14
+    assert data["points_per_visit"] == 20
+    assert data["points_redeem_threshold"] == 200
+
+
+@pytest.mark.asyncio
+async def test_update_reminder_success(client: AsyncClient, db_session):
+    """PUT /reminders/{id} actualiza el recordatorio correctamente."""
+    from app.models.tenant import TenantPlan, Tenant
+    from app.models.user import User
+
+    token = await register_and_login(client, "updrem@test.com", "UpdRem Negocio")
+    user_result = await db_session.execute(select(User).where(User.email == "updrem@test.com"))
+    user = user_result.scalar_one()
+    tenant_result = await db_session.execute(select(Tenant).where(Tenant.id == user.tenant_id))
+    tenant = tenant_result.scalar_one()
+    tenant.plan = TenantPlan.medium
+    await db_session.commit()
+
+    r = await client.post(
+        "/api/v1/automations/reminders",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"message_text": "Mensaje original", "days_before": 1},
+    )
+    assert r.status_code == 201
+    reminder_id = r.json()["id"]
+
+    r2 = await client.put(
+        f"/api/v1/automations/reminders/{reminder_id}",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"message_text": "Mensaje actualizado", "days_before": 3},
+    )
+    assert r2.status_code == 200
+    data = r2.json()
+    assert data["message_text"] == "Mensaje actualizado"
+    assert data["days_before"] == 3
+
+
+@pytest.mark.asyncio
+async def test_update_campaign_success(client: AsyncClient):
+    """PUT /campaigns/{id} actualiza la campaña correctamente."""
+    token = await register_and_login(client, "updcamp@test.com", "UpdCamp Negocio")
+
+    r = await client.post(
+        "/api/v1/automations/campaigns",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "name": "Campaña original",
+            "message_text": "Mensaje {nombre}",
+            "trigger_type": "inactive_days",
+            "trigger_value": 30,
+        },
+    )
+    assert r.status_code == 201
+    campaign_id = r.json()["id"]
+
+    r2 = await client.put(
+        f"/api/v1/automations/campaigns/{campaign_id}",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"name": "Campaña actualizada", "trigger_value": 60},
+    )
+    assert r2.status_code == 200
+    data = r2.json()
+    assert data["name"] == "Campaña actualizada"
+    assert data["trigger_value"] == 60
+
+
+@pytest.mark.asyncio
+async def test_delete_campaign_success(client: AsyncClient):
+    """DELETE /campaigns/{id} elimina la campaña y ya no aparece en listado."""
+    token = await register_and_login(client, "delcamp@test.com", "DelCamp Negocio")
+
+    r = await client.post(
+        "/api/v1/automations/campaigns",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "name": "Para borrar",
+            "message_text": "Hola {nombre}",
+            "trigger_type": "inactive_days",
+            "trigger_value": 45,
+        },
+    )
+    assert r.status_code == 201
+    campaign_id = r.json()["id"]
+
+    r2 = await client.delete(
+        f"/api/v1/automations/campaigns/{campaign_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert r2.status_code == 204
+
+    r3 = await client.get(
+        "/api/v1/automations/campaigns",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert r3.status_code == 200
+    assert len(r3.json()) == 0
+
+
+@pytest.mark.asyncio
 async def test_complete_booking_does_not_error(client: AsyncClient):
     """PATCH /complete en una reserva no produce error — el encolado de recompra es opcional."""
     token = await register_and_login(client, "compbook@test.com", "CompBook Negocio")
