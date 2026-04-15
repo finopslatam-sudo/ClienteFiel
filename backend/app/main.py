@@ -19,6 +19,7 @@ from app.api import customers as customers_router
 from app.api import billing as billing_router
 from app.api import account as account_router
 from app.api import admin as admin_router
+from app.api import automations as automations_router
 
 app = FastAPI(
     title="Cliente Fiel API",
@@ -52,6 +53,7 @@ app.include_router(customers_router.router, prefix="/api/v1")
 app.include_router(billing_router.router, prefix="/api/v1")
 app.include_router(account_router.router, prefix="/api/v1")
 app.include_router(admin_router.router, prefix="/api/v1")
+app.include_router(automations_router.router, prefix="/api/v1")
 
 
 @app.get("/health")
