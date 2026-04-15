@@ -45,6 +45,7 @@ class Booking(Base, TimestampMixin):
     )
     reminder_24h_sent_at: Mapped[datetime | None] = mapped_column(nullable=True)
     reminder_1h_sent_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    repurchase_sent_at: Mapped[datetime | None] = mapped_column(nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_by: Mapped[BookingCreatedBy] = mapped_column(
         SAEnum(BookingCreatedBy), default=BookingCreatedBy.admin, nullable=False

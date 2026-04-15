@@ -10,6 +10,9 @@ from app.models.message_log import MessageLog, MessageLogType, MessageLogStatus
 from app.models.subscription import Subscription
 from app.models.billing_profile import BillingProfile, DocumentType
 from app.models.superadmin import SuperAdminUser
+from app.models.custom_reminder import CustomReminder
+from app.models.automation_settings import AutomationSettings
+from app.models.campaign import Campaign, CampaignTriggerType
 
 __all__ = [
     "Tenant", "TenantPlan", "TenantStatus",
@@ -24,4 +27,7 @@ __all__ = [
     "Subscription",
     "BillingProfile", "DocumentType",
     "SuperAdminUser",
+    "CustomReminder",
+    "AutomationSettings",
+    "Campaign", "CampaignTriggerType",
 ]
