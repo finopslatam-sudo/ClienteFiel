@@ -174,4 +174,20 @@ class BookingService:
         booking.status = new_status
         await self.db.commit()
         await self.db.refresh(booking)
+
+        if new_status == BookingStatus.completed:
+            from app.tasks.automations import send_repurchase_message
+            from app.models.automation_settings import AutomationSettings
+            settings_result = await self.db.execute(
+                select(AutomationSettings).where(
+                    AutomationSettings.tenant_id == tenant_id
+                )
+            )
+            settings = settings_result.scalar_one_or_none()
+            if settings and settings.repurchase_enabled and settings.repurchase_days_after > 0:
+                eta = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(
+                    days=settings.repurchase_days_after
+                )
+                send_repurchase_message.apply_async(args=[str(booking_id)], eta=eta)
+
         return booking

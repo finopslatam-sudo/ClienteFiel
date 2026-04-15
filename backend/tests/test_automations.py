@@ -276,3 +276,42 @@ async def test_send_repurchase_skips_if_settings_disabled():
                 task_mock = MagicMock()
                 await _send_repurchase_async(task_mock, "00000000-0000-0000-0000-000000000001")
                 mock_send.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_complete_booking_does_not_error(client: AsyncClient):
+    """PATCH /complete en una reserva no produce error — el encolado de recompra es opcional."""
+    token = await register_and_login(client, "compbook@test.com", "CompBook Negocio")
+
+    # Crear servicio
+    svc_r = await client.post(
+        "/api/v1/services",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"name": "Corte", "duration_minutes": 30, "price": "10000"},
+    )
+    assert svc_r.status_code == 201
+    service_id = svc_r.json()["id"]
+
+    # Crear reserva
+    book_r = await client.post(
+        "/api/v1/bookings",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "customer_phone": "+56911111111",
+            "service_id": service_id,
+            "scheduled_at": "2026-06-01T10:00:00",
+        },
+    )
+    assert book_r.status_code == 201
+    booking_id = book_r.json()["id"]
+
+    # Marcar como completada — no debe lanzar error
+    from unittest.mock import patch
+    with patch("app.tasks.automations.send_repurchase_message") as mock_task:
+        mock_task.apply_async = lambda *a, **kw: None
+        r = await client.patch(
+            f"/api/v1/bookings/{booking_id}/complete",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+    assert r.status_code == 200
+    assert r.json()["status"] == "completed"

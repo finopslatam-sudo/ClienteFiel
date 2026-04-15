@@ -1,12 +1,27 @@
 # backend/tests/conftest.py
 import os
+import pytest
 import pytest_asyncio
+from unittest.mock import patch, MagicMock
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from app.core.database import Base, get_db
 from app.main import app as fastapi_app
 from app.models.tenant import Tenant, TenantPlan, TenantStatus
 import app.models  # noqa
+
+
+@pytest.fixture(autouse=True)
+def mock_celery_tasks():
+    """Mock all Celery task dispatching so tests don't require a running Redis broker."""
+    noop = MagicMock(return_value=None)
+    with (
+        patch("app.tasks.reminders.send_booking_confirmation.delay", noop),
+        patch("app.tasks.reminders.send_reminder_24h.apply_async", noop),
+        patch("app.tasks.reminders.send_reminder_1h.apply_async", noop),
+        patch("app.tasks.automations.send_repurchase_message.apply_async", noop),
+    ):
+        yield
 
 DATABASE_URL = os.environ.get(
     "DATABASE_URL",
