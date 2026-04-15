@@ -65,17 +65,9 @@ async def _send_repurchase_async(task, booking_id: str) -> None:
             logger.info({"event": "repurchase.not_premium", "tenant_id": str(booking.tenant_id)})
             return
 
-    message = settings.repurchase_message or "Hola {nombre}, fue un placer atenderte. ¿Listo para tu próxima cita?"
     customer_name = booking.customer.name or "Cliente"
     service_name = booking.service.name
     business_name = tenant.name
-
-    final_message = (
-        message
-        .replace("{nombre}", customer_name)
-        .replace("{servicio}", service_name)
-        .replace("{negocio}", business_name)
-    )
 
     log_id = await create_message_log(
         str(booking.tenant_id), booking_id, str(booking.customer_id), "repurchase"
@@ -203,12 +195,6 @@ async def _process_tenant_campaigns(tenant_id: str) -> None:
 
 
 async def _send_campaign_message(tenant_id: str, customer, campaign, business_name: str) -> None:
-    final_message = (
-        campaign.message_text
-        .replace("{nombre}", customer.name or "Cliente")
-        .replace("{negocio}", business_name)
-    )
-
     log_id = await create_message_log(
         tenant_id, None, str(customer.id), "campaign"
     )

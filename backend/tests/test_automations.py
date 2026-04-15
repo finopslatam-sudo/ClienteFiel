@@ -178,9 +178,6 @@ async def test_reminder_isolation_between_tenants(client: AsyncClient, db_sessio
 @pytest.mark.asyncio
 async def test_create_campaign_with_premium_plan(client: AsyncClient):
     """Con plan premium, se puede crear y togglear campañas."""
-    from app.models.tenant import TenantPlan, Tenant
-    from sqlalchemy import select
-
     token = await register_and_login(client, "premcamp@test.com", "Prem Negocio")
     # Los tenants se crean con premium por default en trial
 
