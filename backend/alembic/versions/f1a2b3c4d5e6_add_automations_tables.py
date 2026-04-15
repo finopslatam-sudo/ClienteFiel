@@ -47,15 +47,6 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
-    # Tipo enum para campaign trigger (CREATE IF NOT EXISTS via DO block — compatible con asyncpg)
-    op.execute(
-        "DO $$ BEGIN "
-        "IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'campaigntriggertype') THEN "
-        "CREATE TYPE campaigntriggertype AS ENUM ('inactive_days'); "
-        "END IF; "
-        "END $$"
-    )
-
     # Tabla: campaigns
     op.create_table(
         'campaigns',
@@ -63,7 +54,7 @@ def upgrade() -> None:
         sa.Column('tenant_id', UUID(as_uuid=True), sa.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False),
         sa.Column('name', sa.String(100), nullable=False),
         sa.Column('message_text', sa.Text(), nullable=False),
-        sa.Column('trigger_type', sa.Enum('inactive_days', name='campaigntriggertype', create_type=False), nullable=False),
+        sa.Column('trigger_type', sa.Enum('inactive_days', name='campaigntriggertype'), nullable=False),
         sa.Column('trigger_value', sa.Integer(), nullable=False),
         sa.Column('active', sa.Boolean(), nullable=False, server_default='false'),
         sa.Column('last_run_at', sa.DateTime(), nullable=True),
