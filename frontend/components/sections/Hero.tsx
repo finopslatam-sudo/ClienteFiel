@@ -127,7 +127,7 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* ── Right: video ── */}
+          {/* ── Right: video in browser chrome ── */}
           <motion.div
             variants={fadeInUp}
             initial="hidden"
@@ -136,13 +136,49 @@ export function Hero() {
           >
             <div
               style={{
-                borderRadius: '14px',
+                borderRadius: '12px',
                 overflow: 'hidden',
                 border: '1px solid rgba(6,182,212,0.25)',
                 boxShadow:
                   '0 0 0 1px rgba(6,182,212,0.06), 0 0 60px rgba(6,182,212,0.15), 0 24px 48px rgba(0,0,0,0.5)',
               }}
             >
+              {/* Browser chrome header */}
+              <div
+                style={{
+                  background: '#1e2530',
+                  borderBottom: '1px solid rgba(255,255,255,0.08)',
+                  padding: '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                {/* Traffic lights */}
+                <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57' }} />
+                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#febc2e' }} />
+                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840' }} />
+                </div>
+                {/* URL bar */}
+                <div
+                  style={{
+                    flex: 1,
+                    background: 'rgba(255,255,255,0.06)',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    fontSize: '12px',
+                    color: '#94a3b8',
+                    fontFamily: 'monospace',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  app.clientefiel.cl/dashboard
+                </div>
+              </div>
+              {/* Video */}
               <video
                 ref={videoRef}
                 src="/videocitas.mp4"
