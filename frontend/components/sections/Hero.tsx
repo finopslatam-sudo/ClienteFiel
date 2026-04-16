@@ -38,7 +38,7 @@ export function Hero() {
 
   return (
     <section className="relative w-full overflow-hidden" style={{ background: '#020b14', minHeight: '90vh' }}>
-      {/* ── Background video (right half, full height visible) ── */}
+      {/* ── Background video (full-bleed) ── */}
       <video
         ref={videoRef}
         src="/videocitas.mp4"
@@ -49,14 +49,12 @@ export function Hero() {
         preload="auto"
         style={{
           position: 'absolute',
-          top: '50%',
-          right: '0',
-          transform: 'translateY(-50%)',
-          width: '55%',
+          inset: 0,
+          width: '100%',
           height: '100%',
-          objectFit: 'contain',
-          objectPosition: 'center center',
-          opacity: 0.85,
+          objectFit: 'cover',
+          objectPosition: 'right center',
+          opacity: 0.45,
           zIndex: 0,
         }}
       />
