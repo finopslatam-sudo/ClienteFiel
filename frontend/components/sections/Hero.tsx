@@ -52,9 +52,9 @@ export function Hero() {
           inset: 0,
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
+          objectFit: 'contain',
           objectPosition: 'right center',
-          opacity: 0.45,
+          opacity: 0.75,
           zIndex: 0,
         }}
       />
