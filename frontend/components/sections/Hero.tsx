@@ -37,23 +37,61 @@ export function Hero() {
   }, [])
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ background: '#020b14' }}>
-      {/* Cyber Grid */}
-      <div className="absolute inset-0 cyber-grid pointer-events-none" style={{ zIndex: 0 }} />
+    <section className="relative w-full overflow-hidden" style={{ background: '#020b14', minHeight: '90vh' }}>
+      {/* ── Background video (full-bleed) ── */}
+      <video
+        ref={videoRef}
+        src="/videocitas.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'right center',
+          opacity: 0.45,
+          zIndex: 0,
+        }}
+      />
+
+      {/* Gradient: dark on left (text area), fade to transparent on right (video shows) */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          zIndex: 1,
+          background:
+            'linear-gradient(to right, #020b14 0%, #020b14 38%, rgba(2,11,20,0.75) 55%, rgba(2,11,20,0.15) 100%)',
+        }}
+      />
+
+      {/* Cyber Grid — only on left */}
+      <div
+        className="absolute inset-0 cyber-grid pointer-events-none"
+        style={{
+          zIndex: 1,
+          maskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 70%)',
+          WebkitMaskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 70%)',
+        }}
+      />
+
       {/* Radial glow top-left */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          zIndex: 0,
+          zIndex: 1,
           background:
-            'radial-gradient(ellipse 60% 60% at 20% 50%, rgba(6,182,212,0.08) 0%, transparent 70%)',
+            'radial-gradient(ellipse 50% 70% at 15% 50%, rgba(6,182,212,0.1) 0%, transparent 70%)',
         }}
       />
 
-      <div className="relative max-w-6xl mx-auto px-4 pt-24 pb-20" style={{ zIndex: 1 }}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-          {/* ── Left: text content ── */}
+      <div className="relative max-w-6xl mx-auto px-4 pt-24 pb-20" style={{ zIndex: 2 }}>
+        {/* Text constrained to left half */}
+        <div className="max-w-xl">
           <motion.div variants={staggerContainer} initial="hidden" animate="visible">
             <motion.div variants={fadeInUp}>
               <span
@@ -126,42 +164,6 @@ export function Hero() {
               </motion.div>
             </motion.div>
           </motion.div>
-
-          {/* ── Right: video with gradient mask fade ── */}
-          <motion.div
-            variants={fadeInUp}
-            initial="hidden"
-            animate="visible"
-            className="hidden lg:block"
-          >
-            <div
-              style={{
-                borderRadius: '14px',
-                overflow: 'hidden',
-                boxShadow: '0 0 60px rgba(6,182,212,0.12), 0 24px 48px rgba(0,0,0,0.4)',
-                WebkitMaskImage:
-                  'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), ' +
-                  'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
-                WebkitMaskComposite: 'source-in',
-                maskImage:
-                  'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), ' +
-                  'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
-                maskComposite: 'intersect',
-              }}
-            >
-              <video
-                ref={videoRef}
-                src="/videocitas.mp4"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                style={{ width: '100%', display: 'block' }}
-              />
-            </div>
-          </motion.div>
-
         </div>
       </div>
     </section>
