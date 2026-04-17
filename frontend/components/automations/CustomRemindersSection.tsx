@@ -1,6 +1,7 @@
 // frontend/components/automations/CustomRemindersSection.tsx
 'use client'
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/api'
 
@@ -174,8 +175,8 @@ export function CustomRemindersSection({ plan }: { plan: string }) {
         </div>
       )}
 
-      {/* Modal */}
-      {showModal && (
+      {/* Modal — rendered via portal to escape glass-card stacking context */}
+      {showModal && createPortal(
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.7)' }}
@@ -249,7 +250,8 @@ export function CustomRemindersSection({ plan }: { plan: string }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
