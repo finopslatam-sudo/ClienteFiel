@@ -1,9 +1,11 @@
 'use client'
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import api from '@/lib/api'
+import { ContactSelector, type CustomerOption } from './ContactSelector'
 
 interface Campaign {
   id: string
@@ -14,6 +16,7 @@ interface Campaign {
   active: boolean
   last_run_at: string | null
   created_at: string
+  customer_ids: string[]
 }
 
 interface CampaignForm {
@@ -21,6 +24,7 @@ interface CampaignForm {
   message_text: string
   trigger_value: number
   active: boolean
+  customer_ids: string[]
 }
 
 const VARIABLES = '{nombre}, {negocio}'
@@ -35,6 +39,7 @@ export function CampaignsSection({ plan }: { plan: string }) {
     message_text: '',
     trigger_value: 30,
     active: false,
+    customer_ids: [],
   })
   const [formError, setFormError] = useState('')
 
@@ -47,6 +52,15 @@ export function CampaignsSection({ plan }: { plan: string }) {
       return data
     },
     enabled: !isLocked,
+  })
+
+  const { data: customers = [] } = useQuery<CustomerOption[]>({
+    queryKey: ['customers-simple'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/v1/customers?limit=200&order_by=name&order_dir=asc')
+      return data.customers as CustomerOption[]
+    },
+    enabled: showModal,
   })
 
   const saveMutation = useMutation({
@@ -74,13 +88,19 @@ export function CampaignsSection({ plan }: { plan: string }) {
   })
 
   const resetForm = () => {
-    setForm({ name: '', message_text: '', trigger_value: 30, active: false })
+    setForm({ name: '', message_text: '', trigger_value: 30, active: false, customer_ids: [] })
     setEditingId(null)
     setFormError('')
   }
 
   const openEdit = (c: Campaign) => {
-    setForm({ name: c.name, message_text: c.message_text, trigger_value: c.trigger_value, active: c.active })
+    setForm({
+      name: c.name,
+      message_text: c.message_text,
+      trigger_value: c.trigger_value,
+      active: c.active,
+      customer_ids: c.customer_ids ?? [],
+    })
     setEditingId(c.id)
     setShowModal(true)
   }
@@ -146,6 +166,7 @@ export function CampaignsSection({ plan }: { plan: string }) {
                 </div>
                 <p className="text-xs mt-0.5" style={{ color: '#475569' }}>
                   {c.trigger_value} días inactivo
+                  {c.customer_ids?.length > 0 ? ` · ${c.customer_ids.length} contacto${c.customer_ids.length !== 1 ? 's' : ''}` : ' · Todos'}
                   {c.last_run_at
                     ? ` · Última ejecución: ${format(new Date(c.last_run_at), "d MMM", { locale: es })}`
                     : ' · Sin ejecuciones'}
@@ -179,13 +200,16 @@ export function CampaignsSection({ plan }: { plan: string }) {
         </div>
       )}
 
-      {showModal && (
+      {showModal && createPortal(
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.7)' }}
           onClick={e => { if (e.target === e.currentTarget) { setShowModal(false); resetForm() } }}
         >
-          <div className="glass-card p-6 w-full max-w-md" style={{ border: '1px solid rgba(167,139,250,0.25)' }}>
+          <div
+            className="glass-card p-6 w-full max-w-md"
+            style={{ border: '1px solid rgba(167,139,250,0.25)', maxHeight: '90vh', overflowY: 'auto' }}
+          >
             <h3 className="font-semibold mb-4" style={{ color: '#f1f5f9' }}>
               {editingId ? 'Editar campaña' : 'Nueva campaña'}
             </h3>
@@ -230,6 +254,16 @@ export function CampaignsSection({ plan }: { plan: string }) {
                 </p>
               </div>
 
+              <div>
+                <label className="block text-sm mb-1" style={{ color: '#94a3b8' }}>Enviar a</label>
+                <ContactSelector
+                  value={form.customer_ids}
+                  onChange={ids => setForm(f => ({ ...f, customer_ids: ids }))}
+                  customers={customers}
+                  accentColor="#a78bfa"
+                />
+              </div>
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -261,7 +295,8 @@ export function CampaignsSection({ plan }: { plan: string }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

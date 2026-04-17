@@ -2,12 +2,14 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/api'
+import { ContactSelector, type CustomerOption } from './ContactSelector'
 
 interface AutomationSettings {
   points_enabled: boolean
   points_per_visit: number
   points_redeem_threshold: number
   points_reward_description: string | null
+  points_customer_ids: string[]
 }
 
 export function PointsSection({ plan }: { plan: string }) {
@@ -22,10 +24,20 @@ export function PointsSection({ plan }: { plan: string }) {
     },
   })
 
+  const { data: customers = [] } = useQuery<CustomerOption[]>({
+    queryKey: ['customers-simple'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/v1/customers?limit=200&order_by=name&order_dir=asc')
+      return data.customers as CustomerOption[]
+    },
+    enabled: !isLocked,
+  })
+
   const [enabled, setEnabled] = useState(false)
   const [pointsPerVisit, setPointsPerVisit] = useState(10)
   const [redeemThreshold, setRedeemThreshold] = useState(100)
   const [rewardDescription, setRewardDescription] = useState('')
+  const [customerIds, setCustomerIds] = useState<string[]>([])
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
@@ -34,6 +46,7 @@ export function PointsSection({ plan }: { plan: string }) {
       setPointsPerVisit(settings.points_per_visit)
       setRedeemThreshold(settings.points_redeem_threshold)
       setRewardDescription(settings.points_reward_description ?? '')
+      setCustomerIds(settings.points_customer_ids ?? [])
     }
   }, [settings])
 
@@ -44,6 +57,7 @@ export function PointsSection({ plan }: { plan: string }) {
         points_per_visit: pointsPerVisit,
         points_redeem_threshold: redeemThreshold,
         points_reward_description: rewardDescription || null,
+        points_customer_ids: customerIds,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['automation-settings'] })
@@ -142,6 +156,16 @@ export function PointsSection({ plan }: { plan: string }) {
             disabled={isLocked}
             placeholder="Ej: Descuento de 10% en tu próxima visita"
             className="input-dark w-full px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm mb-1" style={{ color: '#94a3b8' }}>Aplicar a</label>
+          <ContactSelector
+            value={customerIds}
+            onChange={setCustomerIds}
+            customers={customers}
+            accentColor="#a78bfa"
           />
         </div>
 

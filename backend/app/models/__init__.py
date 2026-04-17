@@ -13,7 +13,9 @@ from app.models.superadmin import SuperAdminUser
 from app.models.custom_reminder import CustomReminder
 from app.models.custom_reminder_customer import CustomReminderCustomer
 from app.models.automation_settings import AutomationSettings
+from app.models.automation_target_customer import AutomationTargetCustomer
 from app.models.campaign import Campaign, CampaignTriggerType
+from app.models.campaign_customer import CampaignCustomer
 
 __all__ = [
     "Tenant", "TenantPlan", "TenantStatus",
@@ -31,5 +33,7 @@ __all__ = [
     "CustomReminder",
     "CustomReminderCustomer",
     "AutomationSettings",
+    "AutomationTargetCustomer",
     "Campaign", "CampaignTriggerType",
+    "CampaignCustomer",
 ]

@@ -2,16 +2,19 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/api'
+import { ContactSelector, type CustomerOption } from './ContactSelector'
 
 interface AutomationSettings {
   id: string
   repurchase_enabled: boolean
   repurchase_days_after: number
   repurchase_message: string | null
+  repurchase_customer_ids: string[]
   points_enabled: boolean
   points_per_visit: number
   points_redeem_threshold: number
   points_reward_description: string | null
+  points_customer_ids: string[]
 }
 
 const VARIABLES = '{nombre}, {servicio}, {negocio}'
@@ -29,9 +32,19 @@ export function RepurchaseSection({ plan }: { plan: string }) {
     },
   })
 
+  const { data: customers = [] } = useQuery<CustomerOption[]>({
+    queryKey: ['customers-simple'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/v1/customers?limit=200&order_by=name&order_dir=asc')
+      return data.customers as CustomerOption[]
+    },
+    enabled: !isLocked,
+  })
+
   const [enabled, setEnabled] = useState(false)
   const [daysAfter, setDaysAfter] = useState(30)
   const [message, setMessage] = useState('')
+  const [customerIds, setCustomerIds] = useState<string[]>([])
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
@@ -39,6 +52,7 @@ export function RepurchaseSection({ plan }: { plan: string }) {
       setEnabled(settings.repurchase_enabled)
       setDaysAfter(settings.repurchase_days_after)
       setMessage(settings.repurchase_message ?? '')
+      setCustomerIds(settings.repurchase_customer_ids ?? [])
     }
   }, [settings])
 
@@ -48,6 +62,7 @@ export function RepurchaseSection({ plan }: { plan: string }) {
         repurchase_enabled: enabled,
         repurchase_days_after: daysAfter,
         repurchase_message: message || null,
+        repurchase_customer_ids: customerIds,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['automation-settings'] })
@@ -136,6 +151,15 @@ export function RepurchaseSection({ plan }: { plan: string }) {
           <p className="text-xs mt-1" style={{ color: '#475569' }}>
             Variables: <span style={{ color: '#06b6d4' }}>{VARIABLES}</span>
           </p>
+        </div>
+
+        <div>
+          <label className="block text-sm mb-1" style={{ color: '#94a3b8' }}>Enviar a</label>
+          <ContactSelector
+            value={customerIds}
+            onChange={setCustomerIds}
+            customers={customers}
+          />
         </div>
 
         <button

@@ -12,7 +12,9 @@ from app.models.tenant import Tenant, TenantPlan
 from app.models.custom_reminder import CustomReminder
 from app.models.custom_reminder_customer import CustomReminderCustomer
 from app.models.automation_settings import AutomationSettings
+from app.models.automation_target_customer import AutomationTargetCustomer
 from app.models.campaign import Campaign, CampaignTriggerType
+from app.models.campaign_customer import CampaignCustomer
 
 router = APIRouter(prefix="/automations", tags=["automations"])
 
@@ -54,10 +56,12 @@ class AutomationSettingsUpdate(BaseModel):
     repurchase_enabled: bool | None = None
     repurchase_days_after: int | None = None
     repurchase_message: str | None = None
+    repurchase_customer_ids: list[uuid.UUID] | None = None
     points_enabled: bool | None = None
     points_per_visit: int | None = None
     points_redeem_threshold: int | None = None
     points_reward_description: str | None = None
+    points_customer_ids: list[uuid.UUID] | None = None
 
 
 class AutomationSettingsResponse(BaseModel):
@@ -65,12 +69,12 @@ class AutomationSettingsResponse(BaseModel):
     repurchase_enabled: bool
     repurchase_days_after: int
     repurchase_message: str | None
+    repurchase_customer_ids: list[uuid.UUID] = []
     points_enabled: bool
     points_per_visit: int
     points_redeem_threshold: int
     points_reward_description: str | None
-
-    model_config = {"from_attributes": True}
+    points_customer_ids: list[uuid.UUID] = []
 
 
 class CampaignCreate(BaseModel):
@@ -79,6 +83,7 @@ class CampaignCreate(BaseModel):
     trigger_type: CampaignTriggerType
     trigger_value: int
     active: bool = False
+    customer_ids: list[uuid.UUID] = []
 
 
 class CampaignUpdate(BaseModel):
@@ -87,6 +92,7 @@ class CampaignUpdate(BaseModel):
     trigger_type: CampaignTriggerType | None = None
     trigger_value: int | None = None
     active: bool | None = None
+    customer_ids: list[uuid.UUID] | None = None
 
 
 class CampaignResponse(BaseModel):
@@ -98,8 +104,7 @@ class CampaignResponse(BaseModel):
     active: bool
     last_run_at: datetime | None
     created_at: datetime
-
-    model_config = {"from_attributes": True}
+    customer_ids: list[uuid.UUID] = []
 
 
 # ──────────────────────────────────────────
@@ -256,12 +261,52 @@ async def _get_or_create_settings(tenant_id: uuid.UUID, db: AsyncSession) -> Aut
     return settings
 
 
+def _settings_to_response(settings: AutomationSettings) -> AutomationSettingsResponse:
+    repurchase_ids = [
+        tc.customer_id for tc in settings.target_customers if tc.context == "repurchase"
+    ]
+    points_ids = [
+        tc.customer_id for tc in settings.target_customers if tc.context == "points"
+    ]
+    return AutomationSettingsResponse(
+        id=settings.id,
+        repurchase_enabled=settings.repurchase_enabled,
+        repurchase_days_after=settings.repurchase_days_after,
+        repurchase_message=settings.repurchase_message,
+        repurchase_customer_ids=repurchase_ids,
+        points_enabled=settings.points_enabled,
+        points_per_visit=settings.points_per_visit,
+        points_redeem_threshold=settings.points_redeem_threshold,
+        points_reward_description=settings.points_reward_description,
+        points_customer_ids=points_ids,
+    )
+
+
+async def _sync_target_customers(
+    db: AsyncSession,
+    settings_id: uuid.UUID,
+    context: str,
+    customer_ids: list[uuid.UUID],
+) -> None:
+    existing = await db.execute(
+        select(AutomationTargetCustomer).where(
+            AutomationTargetCustomer.settings_id == settings_id,
+            AutomationTargetCustomer.context == context,
+        )
+    )
+    for row in existing.scalars().all():
+        await db.delete(row)
+    for cid in customer_ids:
+        db.add(AutomationTargetCustomer(settings_id=settings_id, customer_id=cid, context=context))
+
+
 @router.get("/settings", response_model=AutomationSettingsResponse)
 async def get_settings(
     current_tenant: Annotated[Tenant, Depends(get_current_tenant)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    return await _get_or_create_settings(current_tenant.id, db)
+    settings = await _get_or_create_settings(current_tenant.id, db)
+    return _settings_to_response(settings)
 
 
 @router.put("/settings", response_model=AutomationSettingsResponse)
@@ -272,24 +317,58 @@ async def update_settings(
 ):
     premium_fields = {
         "repurchase_enabled", "repurchase_days_after", "repurchase_message",
+        "repurchase_customer_ids",
         "points_enabled", "points_per_visit", "points_redeem_threshold",
-        "points_reward_description",
+        "points_reward_description", "points_customer_ids",
     }
     requested = {k for k, v in payload.model_dump(exclude_none=True).items()}
     if requested & premium_fields:
         _require_premium(current_tenant)
 
     settings = await _get_or_create_settings(current_tenant.id, db)
-    for field, value in payload.model_dump(exclude_none=True).items():
+    data = payload.model_dump(exclude_none=True)
+    repurchase_cids = data.pop("repurchase_customer_ids", None)
+    points_cids = data.pop("points_customer_ids", None)
+    for field, value in data.items():
         setattr(settings, field, value)
+    if repurchase_cids is not None:
+        await _sync_target_customers(db, settings.id, "repurchase", repurchase_cids)
+    if points_cids is not None:
+        await _sync_target_customers(db, settings.id, "points", points_cids)
     await db.commit()
     await db.refresh(settings)
-    return settings
+    return _settings_to_response(settings)
 
 
 # ──────────────────────────────────────────
 # Campaigns
 # ──────────────────────────────────────────
+
+def _campaign_to_response(campaign: Campaign) -> CampaignResponse:
+    return CampaignResponse(
+        id=campaign.id,
+        name=campaign.name,
+        message_text=campaign.message_text,
+        trigger_type=campaign.trigger_type,
+        trigger_value=campaign.trigger_value,
+        active=campaign.active,
+        last_run_at=campaign.last_run_at,
+        created_at=campaign.created_at,
+        customer_ids=[cc.customer_id for cc in campaign.campaign_customers],
+    )
+
+
+async def _sync_campaign_customers(
+    db: AsyncSession, campaign_id: uuid.UUID, customer_ids: list[uuid.UUID]
+) -> None:
+    existing = await db.execute(
+        select(CampaignCustomer).where(CampaignCustomer.campaign_id == campaign_id)
+    )
+    for row in existing.scalars().all():
+        await db.delete(row)
+    for cid in customer_ids:
+        db.add(CampaignCustomer(campaign_id=campaign_id, customer_id=cid))
+
 
 @router.get("/campaigns", response_model=list[CampaignResponse])
 async def list_campaigns(
@@ -301,7 +380,7 @@ async def list_campaigns(
         .where(Campaign.tenant_id == current_tenant.id)
         .order_by(Campaign.created_at)
     )
-    return list(result.scalars().all())
+    return [_campaign_to_response(c) for c in result.scalars().all()]
 
 
 @router.post("/campaigns", response_model=CampaignResponse, status_code=201)
@@ -320,9 +399,12 @@ async def create_campaign(
         active=payload.active,
     )
     db.add(campaign)
+    await db.flush()
+    for cid in payload.customer_ids:
+        db.add(CampaignCustomer(campaign_id=campaign.id, customer_id=cid))
     await db.commit()
     await db.refresh(campaign)
-    return campaign
+    return _campaign_to_response(campaign)
 
 
 @router.put("/campaigns/{campaign_id}", response_model=CampaignResponse)
@@ -342,11 +424,15 @@ async def update_campaign(
     campaign = result.scalar_one_or_none()
     if not campaign:
         raise HTTPException(status_code=404, detail="Campaña no encontrada")
-    for field, value in payload.model_dump(exclude_none=True).items():
+    data = payload.model_dump(exclude_none=True)
+    customer_ids = data.pop("customer_ids", None)
+    for field, value in data.items():
         setattr(campaign, field, value)
+    if customer_ids is not None:
+        await _sync_campaign_customers(db, campaign_id, customer_ids)
     await db.commit()
     await db.refresh(campaign)
-    return campaign
+    return _campaign_to_response(campaign)
 
 
 @router.delete("/campaigns/{campaign_id}", status_code=204)
@@ -388,4 +474,4 @@ async def toggle_campaign(
     campaign.active = not campaign.active
     await db.commit()
     await db.refresh(campaign)
-    return campaign
+    return _campaign_to_response(campaign)

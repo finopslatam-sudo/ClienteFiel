@@ -1,11 +1,15 @@
 import enum
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 from sqlalchemy import String, Integer, Boolean, ForeignKey, Text, Enum as SAEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from app.core.database import Base
 from app.models.base import TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.campaign_customer import CampaignCustomer
 
 
 class CampaignTriggerType(str, enum.Enum):
@@ -30,3 +34,7 @@ class Campaign(Base, TimestampMixin):
     trigger_value: Mapped[int] = mapped_column(Integer, nullable=False)
     active: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     last_run_at: Mapped[datetime | None] = mapped_column(nullable=True)
+
+    campaign_customers: Mapped[list["CampaignCustomer"]] = relationship(
+        "CampaignCustomer", lazy="selectin", cascade="all, delete-orphan"
+    )

@@ -1,9 +1,13 @@
 import uuid
+from typing import TYPE_CHECKING
 from sqlalchemy import Boolean, Integer, ForeignKey, Text, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from app.core.database import Base
 from app.models.base import TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.automation_target_customer import AutomationTargetCustomer
 
 
 class AutomationSettings(Base, TimestampMixin):
@@ -26,3 +30,7 @@ class AutomationSettings(Base, TimestampMixin):
     points_per_visit: Mapped[int] = mapped_column(Integer, default=10, nullable=False)
     points_redeem_threshold: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     points_reward_description: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    target_customers: Mapped[list["AutomationTargetCustomer"]] = relationship(
+        "AutomationTargetCustomer", lazy="selectin", cascade="all, delete-orphan"
+    )
