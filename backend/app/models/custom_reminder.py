@@ -22,4 +22,5 @@ class CustomReminder(Base, TimestampMixin):
     )
     message_text: Mapped[str] = mapped_column(Text, nullable=False)
     days_before: Mapped[int] = mapped_column(Integer, nullable=False)
+    time_unit: Mapped[str] = mapped_column(Text, nullable=False, default="days")
     active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

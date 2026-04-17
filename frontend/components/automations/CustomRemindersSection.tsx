@@ -10,6 +10,7 @@ interface CustomReminder {
   service_id: string | null
   message_text: string
   days_before: number
+  time_unit: string
   active: boolean
   created_at: string
 }
@@ -17,6 +18,7 @@ interface CustomReminder {
 interface ReminderForm {
   message_text: string
   days_before: number
+  time_unit: 'hours' | 'days'
   service_id: string
   active: boolean
 }
@@ -31,6 +33,7 @@ export function CustomRemindersSection({ plan }: { plan: string }) {
   const [form, setForm] = useState<ReminderForm>({
     message_text: '',
     days_before: 1,
+    time_unit: 'hours',
     service_id: '',
     active: true,
   })
@@ -74,7 +77,7 @@ export function CustomRemindersSection({ plan }: { plan: string }) {
   })
 
   const resetForm = () => {
-    setForm({ message_text: '', days_before: 1, service_id: '', active: true })
+    setForm({ message_text: '', days_before: 1, time_unit: 'hours', service_id: '', active: true })
     setEditingId(null)
     setFormError('')
   }
@@ -83,6 +86,7 @@ export function CustomRemindersSection({ plan }: { plan: string }) {
     setForm({
       message_text: r.message_text,
       days_before: r.days_before,
+      time_unit: (r.time_unit as 'hours' | 'days') ?? 'hours',
       service_id: r.service_id ?? '',
       active: r.active,
     })
@@ -149,7 +153,7 @@ export function CustomRemindersSection({ plan }: { plan: string }) {
                   {r.message_text.substring(0, 80)}{r.message_text.length > 80 ? '…' : ''}
                 </p>
                 <p className="text-xs mt-0.5" style={{ color: '#475569' }}>
-                  {r.days_before} día{r.days_before !== 1 ? 's' : ''} antes · {r.active ? 'Activo' : 'Inactivo'}
+                  {r.days_before} {r.time_unit === 'hours' ? `hora${r.days_before !== 1 ? 's' : ''}` : `día${r.days_before !== 1 ? 's' : ''}`} antes · {r.active ? 'Activo' : 'Inactivo'}
                 </p>
               </div>
               <div className="flex gap-2 flex-shrink-0">
@@ -190,16 +194,34 @@ export function CustomRemindersSection({ plan }: { plan: string }) {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm mb-1" style={{ color: '#94a3b8' }}>
-                  Días de anticipación
+                  Anticipación
                 </label>
-                <input
-                  type="number"
-                  min={1}
-                  max={30}
-                  value={form.days_before}
-                  onChange={e => setForm(f => ({ ...f, days_before: parseInt(e.target.value) || 1 }))}
-                  className="input-dark w-full px-3 py-2 text-sm"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    max={form.time_unit === 'hours' ? 72 : 30}
+                    value={form.days_before}
+                    onChange={e => setForm(f => ({ ...f, days_before: parseInt(e.target.value) || 1 }))}
+                    className="input-dark w-24 px-3 py-2 text-sm"
+                  />
+                  <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid rgba(6,182,212,0.25)' }}>
+                    {(['hours', 'days'] as const).map(unit => (
+                      <button
+                        key={unit}
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, time_unit: unit }))}
+                        className="px-4 py-2 text-sm font-medium transition-colors"
+                        style={{
+                          background: form.time_unit === unit ? 'rgba(6,182,212,0.2)' : 'transparent',
+                          color: form.time_unit === unit ? '#06b6d4' : '#64748b',
+                        }}
+                      >
+                        {unit === 'hours' ? 'Horas' : 'Días'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div>

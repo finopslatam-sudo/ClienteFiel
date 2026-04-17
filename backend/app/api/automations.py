@@ -23,6 +23,7 @@ router = APIRouter(prefix="/automations", tags=["automations"])
 class CustomReminderCreate(BaseModel):
     message_text: str
     days_before: int
+    time_unit: str = "days"
     service_id: uuid.UUID | None = None
     active: bool = True
 
@@ -30,6 +31,7 @@ class CustomReminderCreate(BaseModel):
 class CustomReminderUpdate(BaseModel):
     message_text: str | None = None
     days_before: int | None = None
+    time_unit: str | None = None
     service_id: uuid.UUID | None = None
     active: bool | None = None
 
@@ -39,6 +41,7 @@ class CustomReminderResponse(BaseModel):
     service_id: uuid.UUID | None
     message_text: str
     days_before: int
+    time_unit: str
     active: bool
     created_at: datetime
 
@@ -140,6 +143,7 @@ async def create_reminder(
         service_id=payload.service_id,
         message_text=payload.message_text,
         days_before=payload.days_before,
+        time_unit=payload.time_unit,
         active=payload.active,
     )
     db.add(reminder)
