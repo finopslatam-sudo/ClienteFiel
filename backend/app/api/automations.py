@@ -10,6 +10,7 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_tenant
 from app.models.tenant import Tenant, TenantPlan
 from app.models.custom_reminder import CustomReminder
+from app.models.custom_reminder_customer import CustomReminderCustomer
 from app.models.automation_settings import AutomationSettings
 from app.models.campaign import Campaign, CampaignTriggerType
 
@@ -23,17 +24,19 @@ router = APIRouter(prefix="/automations", tags=["automations"])
 class CustomReminderCreate(BaseModel):
     message_text: str
     days_before: int
-    time_unit: str = "days"
+    send_time: str = "09:00"
     service_id: uuid.UUID | None = None
     active: bool = True
+    customer_ids: list[uuid.UUID] = []
 
 
 class CustomReminderUpdate(BaseModel):
     message_text: str | None = None
     days_before: int | None = None
-    time_unit: str | None = None
+    send_time: str | None = None
     service_id: uuid.UUID | None = None
     active: bool | None = None
+    customer_ids: list[uuid.UUID] | None = None
 
 
 class CustomReminderResponse(BaseModel):
@@ -41,11 +44,10 @@ class CustomReminderResponse(BaseModel):
     service_id: uuid.UUID | None
     message_text: str
     days_before: int
-    time_unit: str
+    send_time: str
     active: bool
     created_at: datetime
-
-    model_config = {"from_attributes": True}
+    customer_ids: list[uuid.UUID] = []
 
 
 class AutomationSettingsUpdate(BaseModel):
@@ -118,6 +120,33 @@ def _require_premium(tenant: Tenant) -> None:
 # Custom Reminders
 # ──────────────────────────────────────────
 
+def _reminder_to_response(reminder: CustomReminder) -> CustomReminderResponse:
+    return CustomReminderResponse(
+        id=reminder.id,
+        service_id=reminder.service_id,
+        message_text=reminder.message_text,
+        days_before=reminder.days_before,
+        send_time=reminder.send_time,
+        active=reminder.active,
+        created_at=reminder.created_at,
+        customer_ids=[rc.customer_id for rc in reminder.reminder_customers],
+    )
+
+
+async def _sync_reminder_customers(
+    db: AsyncSession, reminder_id: uuid.UUID, customer_ids: list[uuid.UUID]
+) -> None:
+    existing = await db.execute(
+        select(CustomReminderCustomer).where(
+            CustomReminderCustomer.reminder_id == reminder_id
+        )
+    )
+    for row in existing.scalars().all():
+        await db.delete(row)
+    for cid in customer_ids:
+        db.add(CustomReminderCustomer(reminder_id=reminder_id, customer_id=cid))
+
+
 @router.get("/reminders", response_model=list[CustomReminderResponse])
 async def list_reminders(
     current_tenant: Annotated[Tenant, Depends(get_current_tenant)],
@@ -128,7 +157,7 @@ async def list_reminders(
         .where(CustomReminder.tenant_id == current_tenant.id)
         .order_by(CustomReminder.created_at)
     )
-    return list(result.scalars().all())
+    return [_reminder_to_response(r) for r in result.scalars().all()]
 
 
 @router.post("/reminders", response_model=CustomReminderResponse, status_code=201)
@@ -143,13 +172,16 @@ async def create_reminder(
         service_id=payload.service_id,
         message_text=payload.message_text,
         days_before=payload.days_before,
-        time_unit=payload.time_unit,
+        send_time=payload.send_time,
         active=payload.active,
     )
     db.add(reminder)
+    await db.flush()
+    for cid in payload.customer_ids:
+        db.add(CustomReminderCustomer(reminder_id=reminder.id, customer_id=cid))
     await db.commit()
     await db.refresh(reminder)
-    return reminder
+    return _reminder_to_response(reminder)
 
 
 @router.put("/reminders/{reminder_id}", response_model=CustomReminderResponse)
@@ -169,11 +201,15 @@ async def update_reminder(
     reminder = result.scalar_one_or_none()
     if not reminder:
         raise HTTPException(status_code=404, detail="Recordatorio no encontrado")
-    for field, value in payload.model_dump(exclude_none=True).items():
+    data = payload.model_dump(exclude_none=True)
+    customer_ids = data.pop("customer_ids", None)
+    for field, value in data.items():
         setattr(reminder, field, value)
+    if customer_ids is not None:
+        await _sync_reminder_customers(db, reminder_id, customer_ids)
     await db.commit()
     await db.refresh(reminder)
-    return reminder
+    return _reminder_to_response(reminder)
 
 
 @router.delete("/reminders/{reminder_id}", status_code=204)

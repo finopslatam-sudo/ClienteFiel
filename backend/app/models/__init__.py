@@ -11,6 +11,7 @@ from app.models.subscription import Subscription
 from app.models.billing_profile import BillingProfile, DocumentType
 from app.models.superadmin import SuperAdminUser
 from app.models.custom_reminder import CustomReminder
+from app.models.custom_reminder_customer import CustomReminderCustomer
 from app.models.automation_settings import AutomationSettings
 from app.models.campaign import Campaign, CampaignTriggerType
 
@@ -28,6 +29,7 @@ __all__ = [
     "BillingProfile", "DocumentType",
     "SuperAdminUser",
     "CustomReminder",
+    "CustomReminderCustomer",
     "AutomationSettings",
     "Campaign", "CampaignTriggerType",
 ]
