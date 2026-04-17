@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/api'
+import { ContactSelector, type CustomerOption } from './ContactSelector'
 
 interface TenantInfo {
   name: string
@@ -17,6 +18,7 @@ export function GiftCardSection({ plan }: { plan: string }) {
   const [discountPercent, setDiscountPercent] = useState(20)
   const [freeService, setFreeService] = useState('')
   const [expiryDate, setExpiryDate] = useState('')
+  const [customerIds, setCustomerIds] = useState<string[]>([])
 
   const { data: tenant } = useQuery<TenantInfo>({
     queryKey: ['tenant-info'],
@@ -24,6 +26,15 @@ export function GiftCardSection({ plan }: { plan: string }) {
       const { data } = await api.get('/api/v1/tenant/profile')
       return data
     },
+  })
+
+  const { data: customers = [] } = useQuery<CustomerOption[]>({
+    queryKey: ['customers-simple'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/v1/customers?limit=200&order_by=name&order_dir=asc')
+      return data.customers as CustomerOption[]
+    },
+    enabled: !isLocked,
   })
 
   const businessName = tenant?.name ?? 'Tu Negocio'
@@ -407,6 +418,16 @@ export function GiftCardSection({ plan }: { plan: string }) {
               value={expiryDate}
               onChange={e => setExpiryDate(e.target.value)}
               className="input-dark px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm mb-1" style={{ color: '#94a3b8' }}>Enviar a</label>
+            <ContactSelector
+              value={customerIds}
+              onChange={setCustomerIds}
+              customers={customers}
+              accentColor="#a78bfa"
             />
           </div>
 
