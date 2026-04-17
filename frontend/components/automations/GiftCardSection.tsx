@@ -320,6 +320,18 @@ export function GiftCardSection({ plan }: { plan: string }) {
     link.click()
   }
 
+  const handleDownloadPDF = async () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const { jsPDF } = await import('jspdf')
+    const imgData = canvas.toDataURL('image/png')
+    const W = canvas.width
+    const H = canvas.height
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [W, H] })
+    pdf.addImage(imgData, 'PNG', 0, 0, W, H)
+    pdf.save(`giftcard-${businessName.toLowerCase().replace(/\s+/g, '-')}.pdf`)
+  }
+
   return (
     <div
       className="glass-card p-6"
@@ -431,14 +443,24 @@ export function GiftCardSection({ plan }: { plan: string }) {
             />
           </div>
 
-          <button
-            onClick={handleDownload}
-            disabled={isLocked}
-            className="w-full py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50"
-            style={{ background: 'rgba(167,139,250,0.2)', color: '#a78bfa', border: '1px solid rgba(167,139,250,0.35)' }}
-          >
-            Descargar PNG
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleDownload}
+              disabled={isLocked}
+              className="flex-1 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50"
+              style={{ background: 'rgba(167,139,250,0.2)', color: '#a78bfa', border: '1px solid rgba(167,139,250,0.35)' }}
+            >
+              Descargar PNG
+            </button>
+            <button
+              onClick={handleDownloadPDF}
+              disabled={isLocked}
+              className="flex-1 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50"
+              style={{ background: 'rgba(6,182,212,0.15)', color: '#06b6d4', border: '1px solid rgba(6,182,212,0.3)' }}
+            >
+              Descargar PDF
+            </button>
+          </div>
         </div>
 
         <div>
