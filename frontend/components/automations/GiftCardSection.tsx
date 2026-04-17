@@ -34,84 +34,266 @@ export function GiftCardSection({ plan }: { plan: string }) {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    const W = 600
-    const H = 320
+    const W = 680
+    const H = 360
     canvas.width = W
     canvas.height = H
 
-    // Fondo degradado
-    const grad = ctx.createLinearGradient(0, 0, W, H)
-    grad.addColorStop(0, '#0c0f1f')
-    grad.addColorStop(0.5, '#0d1a2e')
-    grad.addColorStop(1, '#150b2e')
-    ctx.fillStyle = grad
+    // Draw text with manual letter spacing
+    const drawSpaced = (text: string, x: number, y: number, gap: number) => {
+      let cx = x
+      for (const ch of text) {
+        ctx.fillText(ch, cx, y)
+        cx += ctx.measureText(ch).width + gap
+      }
+    }
+
+    // Rose illustration (cx, cy = center, r = radius, alpha = opacity)
+    const drawRose = (cx: number, cy: number, r: number, alpha: number) => {
+      ctx.save()
+      ctx.translate(cx, cy)
+      ctx.globalAlpha = alpha
+
+      // Leaves
+      for (let i = 0; i < 2; i++) {
+        ctx.save()
+        ctx.rotate(i === 0 ? Math.PI * 0.72 : Math.PI * 1.28)
+        ctx.beginPath()
+        ctx.moveTo(0, 0)
+        ctx.bezierCurveTo(r * 0.28, -r * 0.1, r * 0.42, -r * 0.48, 0, -r * 0.58)
+        ctx.bezierCurveTo(-r * 0.38, -r * 0.48, -r * 0.22, -r * 0.1, 0, 0)
+        const lg = ctx.createLinearGradient(0, -r * 0.58, 0, 0)
+        lg.addColorStop(0, '#3a8040')
+        lg.addColorStop(1, '#1e4a22')
+        ctx.fillStyle = lg
+        ctx.fill()
+        ctx.restore()
+      }
+
+      // Outer petals (6)
+      for (let i = 0; i < 6; i++) {
+        ctx.save()
+        ctx.rotate((Math.PI * 2 / 6) * i)
+        ctx.beginPath()
+        ctx.moveTo(0, 0)
+        ctx.bezierCurveTo(-r * 0.28, -r * 0.18, -r * 0.24, -r * 0.84, 0, -r * 0.97)
+        ctx.bezierCurveTo(r * 0.24, -r * 0.84, r * 0.28, -r * 0.18, 0, 0)
+        const pg = ctx.createLinearGradient(0, -r * 0.97, 0, 0)
+        pg.addColorStop(0, '#ffb0c4')
+        pg.addColorStop(0.5, '#d4526e')
+        pg.addColorStop(1, '#8a1a30')
+        ctx.fillStyle = pg
+        ctx.fill()
+        ctx.restore()
+      }
+
+      // Mid petals (5, offset)
+      for (let i = 0; i < 5; i++) {
+        ctx.save()
+        ctx.rotate((Math.PI * 2 / 5) * i + 0.32)
+        ctx.beginPath()
+        ctx.moveTo(0, 0)
+        ctx.bezierCurveTo(-r * 0.2, -r * 0.1, -r * 0.16, -r * 0.62, 0, -r * 0.7)
+        ctx.bezierCurveTo(r * 0.16, -r * 0.62, r * 0.2, -r * 0.1, 0, 0)
+        const pg = ctx.createLinearGradient(0, -r * 0.7, 0, 0)
+        pg.addColorStop(0, '#ffc8d5')
+        pg.addColorStop(0.6, '#e06080')
+        pg.addColorStop(1, '#a02040')
+        ctx.fillStyle = pg
+        ctx.fill()
+        ctx.restore()
+      }
+
+      // Inner petals (4)
+      for (let i = 0; i < 4; i++) {
+        ctx.save()
+        ctx.rotate((Math.PI * 2 / 4) * i + 0.85)
+        ctx.beginPath()
+        ctx.moveTo(0, 0)
+        ctx.bezierCurveTo(-r * 0.13, -r * 0.07, -r * 0.11, -r * 0.38, 0, -r * 0.44)
+        ctx.bezierCurveTo(r * 0.11, -r * 0.38, r * 0.13, -r * 0.07, 0, 0)
+        ctx.fillStyle = '#f5c0cf'
+        ctx.fill()
+        ctx.restore()
+      }
+
+      // Center bud
+      ctx.beginPath()
+      ctx.arc(0, 0, r * 0.13, 0, Math.PI * 2)
+      const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 0.13)
+      cg.addColorStop(0, '#ffe0e8')
+      cg.addColorStop(1, '#b82848')
+      ctx.fillStyle = cg
+      ctx.fill()
+
+      ctx.globalAlpha = 1
+      ctx.restore()
+    }
+
+    // L-shaped corner ornament
+    const drawCorner = (x: number, y: number, dx: number, dy: number) => {
+      const s = 20
+      ctx.strokeStyle = 'rgba(201,168,76,0.35)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(x + dx * s, y)
+      ctx.lineTo(x, y)
+      ctx.lineTo(x, y + dy * s)
+      ctx.stroke()
+    }
+
+    // ── BACKGROUND ──────────────────────────────────────────────
+    const bg = ctx.createLinearGradient(0, 0, W, H)
+    bg.addColorStop(0, '#09101e')
+    bg.addColorStop(0.45, '#0d1422')
+    bg.addColorStop(1, '#0f0916')
+    ctx.fillStyle = bg
     ctx.beginPath()
-    ctx.roundRect(0, 0, W, H, 16)
+    ctx.roundRect(0, 0, W, H, 20)
     ctx.fill()
 
-    // Borde violeta
-    ctx.strokeStyle = 'rgba(167,139,250,0.5)'
+    // Rose glow (upper-right)
+    const rGlow = ctx.createRadialGradient(W - 108, H / 2, 0, W - 108, H / 2, 220)
+    rGlow.addColorStop(0, 'rgba(212,82,110,0.09)')
+    rGlow.addColorStop(1, 'transparent')
+    ctx.fillStyle = rGlow
+    ctx.beginPath()
+    ctx.roundRect(0, 0, W, H, 20)
+    ctx.fill()
+
+    // Gold glow (lower-left)
+    const gGlow = ctx.createRadialGradient(0, H, 0, 0, H, 260)
+    gGlow.addColorStop(0, 'rgba(201,168,76,0.06)')
+    gGlow.addColorStop(1, 'transparent')
+    ctx.fillStyle = gGlow
+    ctx.beginPath()
+    ctx.roundRect(0, 0, W, H, 20)
+    ctx.fill()
+
+    // ── SUBTLE DIAGONAL MESH ────────────────────────────────────
+    ctx.save()
+    ctx.globalAlpha = 0.022
+    ctx.strokeStyle = '#c9a84c'
+    ctx.lineWidth = 0.5
+    for (let i = -H; i < W + H; i += 28) {
+      ctx.beginPath()
+      ctx.moveTo(i, 0)
+      ctx.lineTo(i + H, H)
+      ctx.stroke()
+    }
+    ctx.globalAlpha = 1
+    ctx.restore()
+
+    // ── GOLD BORDER ─────────────────────────────────────────────
+    const border = ctx.createLinearGradient(0, 0, W, H)
+    border.addColorStop(0, 'rgba(201,168,76,0.7)')
+    border.addColorStop(0.5, 'rgba(232,201,122,0.28)')
+    border.addColorStop(1, 'rgba(201,168,76,0.65)')
+    ctx.strokeStyle = border
     ctx.lineWidth = 1.5
     ctx.beginPath()
-    ctx.roundRect(1, 1, W - 2, H - 2, 15)
+    ctx.roundRect(1, 1, W - 2, H - 2, 19)
     ctx.stroke()
 
-    // Círculo decorativo fondo
+    // ── LEFT ACCENT STRIPE ──────────────────────────────────────
+    const stripe = ctx.createLinearGradient(0, 0, 0, H)
+    stripe.addColorStop(0, '#d4526e')
+    stripe.addColorStop(0.5, '#c9a84c')
+    stripe.addColorStop(1, '#8a1a30')
+    ctx.fillStyle = stripe
     ctx.beginPath()
-    ctx.arc(W - 60, 60, 120, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(167,139,250,0.06)'
+    ctx.roundRect(0, 0, 5, H, [20, 0, 0, 20])
     ctx.fill()
 
+    // ── ROSE ────────────────────────────────────────────────────
+    drawRose(W - 108, H / 2 - 8, 130, 0.09)   // large watermark
+    drawRose(W - 108, H / 2 - 8, 74, 0.6)     // main rose
+
+    // ── HEADER ──────────────────────────────────────────────────
+    const nameGrad = ctx.createLinearGradient(40, 0, 360, 0)
+    nameGrad.addColorStop(0, '#e8c97a')
+    nameGrad.addColorStop(1, '#c9a84c')
+    ctx.fillStyle = nameGrad
+    ctx.font = '700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    drawSpaced(businessName.toUpperCase(), 40, 52, 2.5)
+
+    ctx.fillStyle = 'rgba(201,168,76,0.45)'
+    ctx.font = '500 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    ctx.fillText('✦  G I F T   C A R D  ✦', 40, 74)
+
+    // Header separator line
+    const hLine = ctx.createLinearGradient(40, 0, 400, 0)
+    hLine.addColorStop(0, 'rgba(201,168,76,0.4)')
+    hLine.addColorStop(1, 'transparent')
+    ctx.strokeStyle = hLine
+    ctx.lineWidth = 0.8
     ctx.beginPath()
-    ctx.arc(60, H - 40, 80, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(6,182,212,0.05)'
-    ctx.fill()
+    ctx.moveTo(40, 88)
+    ctx.lineTo(400, 88)
+    ctx.stroke()
 
-    // Nombre del negocio
-    ctx.font = 'bold 18px -apple-system, system-ui, sans-serif'
-    ctx.fillStyle = '#94a3b8'
-    ctx.fillText(businessName.toUpperCase(), 36, 52)
-
-    // GIFT CARD label
-    ctx.font = '600 11px -apple-system, system-ui, sans-serif'
-    ctx.fillStyle = 'rgba(167,139,250,0.7)'
-    ctx.fillText('GIFT CARD', 36, 78)
-
-    // Oferta principal
+    // ── OFFER TEXT ──────────────────────────────────────────────
     const offerText = cardType === 'discount'
       ? `${discountPercent}% OFF`
       : freeService || 'Servicio Gratis'
-    const gradient2 = ctx.createLinearGradient(0, 100, W, 200)
-    gradient2.addColorStop(0, '#a78bfa')
-    gradient2.addColorStop(1, '#06b6d4')
-    ctx.fillStyle = gradient2
-    ctx.font = 'bold 62px -apple-system, system-ui, sans-serif'
-    ctx.fillText(offerText, 36, 175)
 
-    // Subtítulo
+    const fontSize = offerText.length > 14 ? 44 : offerText.length > 9 ? 56 : 70
+    ctx.font = `800 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`
+
+    const offerGrad = ctx.createLinearGradient(40, 105, 440, 220)
+    offerGrad.addColorStop(0, '#f5ede0')
+    offerGrad.addColorStop(0.3, '#e8c97a')
+    offerGrad.addColorStop(0.7, '#d4526e')
+    offerGrad.addColorStop(1, '#a01838')
+    ctx.fillStyle = offerGrad
+    ctx.fillText(offerText, 40, 196, W - 240)
+
     if (cardType === 'discount') {
-      ctx.font = '16px -apple-system, system-ui, sans-serif'
-      ctx.fillStyle = '#64748b'
-      ctx.fillText('en tu próxima visita', 36, 205)
+      ctx.font = '400 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      ctx.fillStyle = 'rgba(201,168,76,0.5)'
+      ctx.fillText('en tu próxima visita', 42, 222)
     }
 
-    // Fecha de expiración
-    if (expiryDate) {
-      ctx.font = '13px -apple-system, system-ui, sans-serif'
-      ctx.fillStyle = '#475569'
-      ctx.fillText(`Válida hasta: ${new Date(expiryDate + 'T00:00:00').toLocaleDateString('es-CL')}`, 36, H - 36)
-    }
-
-    // Línea inferior decorativa
-    const lineGrad = ctx.createLinearGradient(36, 0, W - 36, 0)
-    lineGrad.addColorStop(0, 'rgba(167,139,250,0.5)')
-    lineGrad.addColorStop(1, 'rgba(6,182,212,0.3)')
-    ctx.strokeStyle = lineGrad
-    ctx.lineWidth = 1
+    // ── BOTTOM AREA ─────────────────────────────────────────────
+    const bLine = ctx.createLinearGradient(40, 0, W - 160, 0)
+    bLine.addColorStop(0, 'transparent')
+    bLine.addColorStop(0.08, 'rgba(201,168,76,0.38)')
+    bLine.addColorStop(0.9, 'rgba(201,168,76,0.18)')
+    bLine.addColorStop(1, 'transparent')
+    ctx.strokeStyle = bLine
+    ctx.lineWidth = 0.8
     ctx.beginPath()
-    ctx.moveTo(36, H - 50)
-    ctx.lineTo(W - 36, H - 50)
+    ctx.moveTo(40, H - 52)
+    ctx.lineTo(W - 160, H - 52)
     ctx.stroke()
+
+    // Diamond ornament on separator
+    ctx.save()
+    ctx.translate(220, H - 52)
+    ctx.rotate(Math.PI / 4)
+    ctx.fillStyle = 'rgba(201,168,76,0.5)'
+    ctx.fillRect(-2.5, -2.5, 5, 5)
+    ctx.restore()
+
+    // Expiry / promo text
+    ctx.font = '400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    if (expiryDate) {
+      ctx.fillStyle = 'rgba(201,168,76,0.5)'
+      ctx.fillText(
+        `Válida hasta: ${new Date(expiryDate + 'T00:00:00').toLocaleDateString('es-CL')}`,
+        40, H - 30
+      )
+    } else {
+      ctx.fillStyle = 'rgba(148,126,100,0.32)'
+      ctx.fillText('Exclusivo · Sin fecha de expiración', 40, H - 30)
+    }
+
+    // ── CORNER ORNAMENTS ────────────────────────────────────────
+    drawCorner(16, 16, 1, 1)
+    drawCorner(W - 16, 16, -1, 1)
+    drawCorner(16, H - 16, 1, -1)
+    drawCorner(W - 16, H - 16, -1, -1)
+
   }, [businessName, cardType, discountPercent, freeService, expiryDate])
 
   useEffect(() => {
@@ -157,7 +339,6 @@ export function GiftCardSection({ plan }: { plan: string }) {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Controles */}
         <div className="space-y-4">
           <div>
             <label className="block text-sm mb-2" style={{ color: '#94a3b8' }}>Tipo de oferta</label>
@@ -239,7 +420,6 @@ export function GiftCardSection({ plan }: { plan: string }) {
           </button>
         </div>
 
-        {/* Preview */}
         <div>
           <p className="text-xs mb-2" style={{ color: '#475569' }}>Vista previa</p>
           <canvas
@@ -247,7 +427,7 @@ export function GiftCardSection({ plan }: { plan: string }) {
             style={{
               width: '100%',
               borderRadius: '12px',
-              border: '1px solid rgba(167,139,250,0.15)',
+              border: '1px solid rgba(201,168,76,0.12)',
             }}
           />
         </div>
