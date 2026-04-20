@@ -12,9 +12,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         }}
       >
         <nav className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo_sinfondo.png?v=2" alt="Cliente Fiel" style={{ height: '52px', width: 'auto' }} />
+            <img src="/icon.svg" alt="" style={{ height: '38px', width: 'auto' }} />
+            <span style={{ fontSize: '19px', fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.02em', lineHeight: 1 }}>
+              Cliente<span style={{ color: '#06b6d4' }}>Fiel</span>
+            </span>
           </Link>
           <div className="flex items-center gap-6">
             <Link
@@ -49,9 +52,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         }}
       >
         <div className="max-w-6xl mx-auto px-4 text-center text-sm">
-          <div className="flex justify-center mb-3">
+          <div className="flex justify-center items-center gap-2 mb-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo_sinfondo.png?v=2" alt="Cliente Fiel" style={{ height: '40px', width: 'auto' }} />
+            <img src="/icon.svg" alt="" style={{ height: '32px', width: 'auto' }} />
+            <span style={{ fontSize: '16px', fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.02em' }}>
+              Cliente<span style={{ color: '#06b6d4' }}>Fiel</span>
+            </span>
           </div>
           <p style={{ color: '#475569' }}>Automatiza tu WhatsApp Business. Sin apps, sin complicaciones.</p>
           <p className="mt-4" style={{ color: '#475569' }}>© 2026 Cliente Fiel. Chile.</p>
