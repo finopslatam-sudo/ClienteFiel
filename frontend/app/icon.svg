@@ -1,12 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="14" fill="#0f172a"/>
-  <rect width="64" height="64" rx="14" fill="url(#grad)" opacity="0.15"/>
-  <rect x="1" y="1" width="62" height="62" rx="13" stroke="#06b6d4" stroke-width="1.5" opacity="0.5"/>
-  <text x="32" y="44" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#06b6d4" text-anchor="middle" letter-spacing="-1">CF</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 140">
   <defs>
-    <linearGradient id="grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#06b6d4"/>
-      <stop offset="100%" stop-color="#0891b2"/>
+    <linearGradient id="cloudGrad" x1="0" y1="0" x2="180" y2="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#193f72"/>
+      <stop offset="55%" stop-color="#1b68a8"/>
+      <stop offset="100%" stop-color="#0db4cc"/>
     </linearGradient>
+    <linearGradient id="tealArc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#14c8e8"/>
+      <stop offset="100%" stop-color="#0898b8"/>
+    </linearGradient>
+    <clipPath id="cloudClip">
+      <path d="M 22 118 Q 4 118 4 96 Q 4 75 24 68 Q 16 46 36 37 Q 44 12 72 17 Q 86 2 112 14 Q 134 4 148 24 Q 168 18 170 42 Q 180 46 178 68 Q 176 90 156 92 L 22 118 Z"/>
+    </clipPath>
   </defs>
+
+  <!-- Cloud body -->
+  <path d="M 22 118 Q 4 118 4 96 Q 4 75 24 68 Q 16 46 36 37 Q 44 12 72 17 Q 86 2 112 14 Q 134 4 148 24 Q 168 18 170 42 Q 180 46 178 68 Q 176 90 156 92 L 22 118 Z"
+    fill="url(#cloudGrad)"/>
+
+  <!-- Infinity symbol clipped to cloud -->
+  <g clip-path="url(#cloudClip)">
+    <!-- Left lobe (white) -->
+    <path d="M 91 67 C 88 50, 74 38, 60 44 C 47 50, 44 66, 50 76 C 56 86, 70 86, 80 80 C 86 76, 90 71, 91 67 Z"
+      fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- Right lobe (teal) -->
+    <path d="M 91 67 C 94 84, 108 96, 122 90 C 135 84, 138 68, 132 58 C 126 48, 112 48, 102 54 C 96 58, 92 63, 91 67 Z"
+      fill="none" stroke="#1ad4f0" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- Teal accent dot (upper right area) -->
+    <circle cx="122" cy="52" r="7" fill="#1ad4f0" opacity="0.9"/>
+    <!-- Center cross point -->
+    <circle cx="91" cy="67" r="4" fill="white" opacity="0.7"/>
+  </g>
 </svg>
