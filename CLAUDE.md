@@ -314,7 +314,7 @@ test: agregar test de aislamiento multi-tenant
 - Preview deployments en PRs
 - Variables en Vercel Dashboard (no en código)
 
-### Backend → Hetzner VPS (46.225.154.115)
+### Backend → Hetzner VPS (49.12.66.17)
 - Python 3.12 + virtualenv + uvicorn + systemd
 - Nginx como reverse proxy con SSL (Certbot / Let's Encrypt)
 - PostgreSQL y Redis corriendo en el mismo servidor

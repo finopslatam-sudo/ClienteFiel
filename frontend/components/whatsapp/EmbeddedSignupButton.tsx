@@ -57,7 +57,7 @@ export function EmbeddedSignupButton({ onSuccess, onError }: Props) {
     setLoading(true)
 
     window.FB.login(
-      async (response) => {
+      (response) => {
         if (!response.authResponse) {
           setLoading(false)
           onError('Autorización cancelada por el usuario.')

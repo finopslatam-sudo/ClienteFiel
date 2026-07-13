@@ -125,6 +125,8 @@ class BookingService:
         date_from: datetime | None = None,
         date_to: datetime | None = None,
     ) -> list[Booking]:
+        date_from = self._to_naive_utc(date_from)
+        date_to = self._to_naive_utc(date_to)
         query = select(Booking).where(Booking.tenant_id == tenant_id)
         if status:
             query = query.where(Booking.status == status)
@@ -135,6 +137,15 @@ class BookingService:
         result = await self.db.execute(query.order_by(Booking.scheduled_at))
         return list(result.scalars().all())
 
+    @staticmethod
+    def _to_naive_utc(value: datetime | None) -> datetime | None:
+        """Normalize an optional datetime to naive UTC to match the
+        TIMESTAMP WITHOUT TIME ZONE `scheduled_at` column, since asyncpg
+        rejects binding tz-aware datetimes against naive timestamp columns."""
+        if value is not None and value.tzinfo is not None:
+            return value.astimezone(timezone.utc).replace(tzinfo=None)
+        return value
+
     async def list_bookings_with_details(
         self,
         tenant_id: uuid.UUID,
@@ -142,6 +153,8 @@ class BookingService:
         date_from: datetime | None = None,
         date_to: datetime | None = None,
     ) -> list[tuple[Booking, str | None, str | None, str | None]]:
+        date_from = self._to_naive_utc(date_from)
+        date_to = self._to_naive_utc(date_to)
         query = (
             select(
                 Booking,

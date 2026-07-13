@@ -37,7 +37,9 @@ async function fetchCustomers(params: {
   order_dir: SortDir
   offset: number
 }): Promise<CustomerListResponse> {
-  const { data } = await api.get('/api/v1/customers', { params: { ...params, limit: 50 } })
+  const { data } = await api.get('/api/v1/customers', {
+    params: { ...params, status: params.status || undefined, limit: 50 },
+  })
   return data
 }
 
