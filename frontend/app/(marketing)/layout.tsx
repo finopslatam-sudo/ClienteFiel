@@ -11,10 +11,10 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           borderBottom: '1px solid rgba(6, 182, 212, 0.08)',
         }}
       >
-        <nav className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        <nav className="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo_sinfondo.png?v=2" alt="Cliente Fiel" style={{ height: '52px', width: 'auto' }} />
+            <img src="/logo_sinfondo.png?v=2" alt="Cliente Fiel" style={{ height: '72px', width: 'auto' }} />
           </Link>
           <div className="flex items-center gap-6">
             <Link
