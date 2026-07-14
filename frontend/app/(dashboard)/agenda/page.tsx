@@ -305,15 +305,17 @@ export default function AgendaPage() {
             ))}
           </motion.div>
         ) : (
-          <MonthlyCalendar
-            bookings={data?.bookings ?? []}
-            currentMonth={currentMonth}
-            onPrevMonth={() => setCurrentMonth(subMonths(currentMonth, 1))}
-            onNextMonth={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            onComplete={(id) => completeBooking.mutate(id)}
-            onCancel={(id) => cancelBooking.mutate(id)}
-            onNewBooking={handleNewBooking}
-          />
+          <div id="tour-agenda-calendar">
+            <MonthlyCalendar
+              bookings={data?.bookings ?? []}
+              currentMonth={currentMonth}
+              onPrevMonth={() => setCurrentMonth(subMonths(currentMonth, 1))}
+              onNextMonth={() => setCurrentMonth(addMonths(currentMonth, 1))}
+              onComplete={(id) => completeBooking.mutate(id)}
+              onCancel={(id) => cancelBooking.mutate(id)}
+              onNewBooking={handleNewBooking}
+            />
+          </div>
         )
       )}
 

@@ -76,7 +76,9 @@ export default function WhatsappPage() {
               <p className="text-slate-600 text-sm mb-6">
                 Conecta tu WhatsApp Business para empezar a automatizar reservas y recordatorios.
               </p>
-              <EmbeddedSignupButton onSuccess={handleSuccess} onError={setError} />
+              <div id="tour-whatsapp-connect">
+                <EmbeddedSignupButton onSuccess={handleSuccess} onError={setError} />
+              </div>
             </>
           )}
           {error && (

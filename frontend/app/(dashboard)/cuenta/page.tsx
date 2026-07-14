@@ -155,7 +155,7 @@ export default function CuentaPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div id="tour-cuenta-profile" className="max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-2" style={{ color: '#f1f5f9' }}>Mi Cuenta</h1>
       <p className="text-sm mb-8" style={{ color: '#64748b' }}>Gestiona tus datos personales y de facturación</p>
 

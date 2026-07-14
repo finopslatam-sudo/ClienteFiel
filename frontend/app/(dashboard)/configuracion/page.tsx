@@ -385,7 +385,7 @@ export default function ConfiguracionPage() {
   ]
 
   return (
-    <div>
+    <div id="tour-configuracion-form">
       <h1 className="text-2xl font-bold mb-6" style={{ color: '#f1f5f9' }}>Configuración</h1>
 
       <div className="flex gap-1 mb-6 p-1 rounded-lg w-fit"

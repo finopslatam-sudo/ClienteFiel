@@ -1,24 +1,31 @@
 // frontend/components/dashboard/Sidebar.tsx
 'use client'
 import Link from 'next/link'
-
+import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/lib/auth'
+import { useTour } from '@/lib/tour/useTour'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
+  { href: '/whatsapp', label: 'WhatsApp', icon: '💬' },
   { href: '/agenda', label: 'Agenda', icon: '📅' },
   { href: '/clientes', label: 'Clientes', icon: '👥' },
   { href: '/automatizaciones', label: 'Automatizaciones', icon: '⚡' },
   { href: '/configuracion', label: 'Configuración', icon: '⚙️' },
   { href: '/cuenta', label: 'Cuenta', icon: '👤' },
-  { href: '/whatsapp', label: 'WhatsApp', icon: '💬' },
-  { href: '/logs', label: 'Logs', icon: '📋' },
   { href: '/suscripcion', label: 'Suscripción', icon: '💳' },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { startTourForRoute } = useTour(pathname)
+
+  useEffect(() => {
+    const timer = setTimeout(() => startTourForRoute(false), 400)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname])
 
   return (
     <aside
@@ -74,7 +81,22 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4" style={{ borderTop: '1px solid rgba(6, 182, 212, 0.08)' }}>
+      <div className="p-4 space-y-1" style={{ borderTop: '1px solid rgba(6, 182, 212, 0.08)' }}>
+        <button
+          onClick={() => startTourForRoute(true)}
+          className="w-full text-left text-sm px-3 py-2 rounded-lg transition-colors flex items-center gap-2"
+          style={{ color: '#475569' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#94a3b8'
+            e.currentTarget.style.background = 'rgba(6, 182, 212, 0.05)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#475569'
+            e.currentTarget.style.background = 'transparent'
+          }}
+        >
+          <span>❔</span> ¿Cómo funciona?
+        </button>
         <button
           onClick={() => logout()}
           className="w-full text-left text-sm px-3 py-2 rounded-lg transition-colors"

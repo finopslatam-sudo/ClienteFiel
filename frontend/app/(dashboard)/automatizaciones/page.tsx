@@ -25,7 +25,7 @@ export default function AutomatizacionesPage() {
   const plan = subscription?.plan ?? 'basic'
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <div id="tour-automatizaciones-list" className="max-w-3xl mx-auto space-y-8">
       <div>
         <h1 className="text-2xl font-bold mb-2" style={{ color: '#f1f5f9' }}>
           Automatizaciones

@@ -12,6 +12,7 @@ from app.core.database import get_db
 from app.core.redis_client import is_message_processed, mark_message_processed
 from app.models.whatsapp import WhatsappConnection
 from app.services.billing_service import BillingService
+from app.services.conversation_service import ConversationService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
@@ -61,8 +62,19 @@ async def receive_whatsapp_webhook(
     entries = data.get("entry", [])
     for entry in entries:
         for change in entry.get("changes", []):
-            messages = change.get("value", {}).get("messages", [])
-            for message in messages:
+            value = change.get("value", {})
+            phone_number_id = value.get("metadata", {}).get("phone_number_id")
+            conn = None
+            if phone_number_id:
+                result = await db.execute(
+                    select(WhatsappConnection).where(
+                        WhatsappConnection.phone_number_id == phone_number_id,
+                        WhatsappConnection.is_active,
+                    )
+                )
+                conn = result.scalar_one_or_none()
+
+            for message in value.get("messages", []):
                 meta_message_id = message.get("id")
                 if not meta_message_id:
                     continue
@@ -76,22 +88,41 @@ async def receive_whatsapp_webhook(
                 except Exception:
                     pass  # Redis unavailable — proceed without idempotency check
 
-                # Identificar tenant por phone_number_id
-                phone_number_id = change.get("value", {}).get("metadata", {}).get("phone_number_id")
-                if phone_number_id:
-                    result = await db.execute(
-                        select(WhatsappConnection).where(
-                            WhatsappConnection.phone_number_id == phone_number_id,
-                            WhatsappConnection.is_active,
+                if conn:
+                    logger.info({
+                        "event": "webhook.received",
+                        "tenant_id": str(conn.tenant_id),
+                        "meta_message_id": meta_message_id,
+                    })
+                    try:
+                        body_text = message.get("text", {}).get("body") if message.get("type") == "text" else None
+                        from_number = message.get("from")
+                        await ConversationService(db).record_inbound_message(
+                            tenant_id=conn.tenant_id,
+                            phone_number=from_number,
+                            body=body_text,
+                            meta_message_id=meta_message_id,
                         )
-                    )
-                    conn = result.scalar_one_or_none()
-                    if conn:
-                        logger.info({
-                            "event": "webhook.received",
-                            "tenant_id": str(conn.tenant_id),
-                            "meta_message_id": meta_message_id,
-                        })
+                    except Exception:
+                        logger.exception({"event": "webhook.message_persist_failed", "meta_message_id": meta_message_id})
+
+            # Actualizaciones de estado de mensajes salientes (enviado/entregado/leído/fallido)
+            if conn:
+                for status_update in value.get("statuses", []):
+                    try:
+                        from app.models.message import MessageStatus
+                        status_map = {
+                            "sent": MessageStatus.sent,
+                            "delivered": MessageStatus.delivered,
+                            "read": MessageStatus.read,
+                            "failed": MessageStatus.failed,
+                        }
+                        new_status = status_map.get(status_update.get("status"))
+                        wamid = status_update.get("id")
+                        if new_status and wamid:
+                            await ConversationService(db).update_message_status_by_meta_id(wamid, new_status)
+                    except Exception:
+                        logger.exception({"event": "webhook.status_update_failed"})
 
     return Response(status_code=200)
 

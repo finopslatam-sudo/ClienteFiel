@@ -16,6 +16,8 @@ from app.models.automation_settings import AutomationSettings
 from app.models.automation_target_customer import AutomationTargetCustomer
 from app.models.campaign import Campaign, CampaignTriggerType
 from app.models.campaign_customer import CampaignCustomer
+from app.models.conversation import Conversation
+from app.models.message import Message, MessageDirection, MessageStatus
 
 __all__ = [
     "Tenant", "TenantPlan", "TenantStatus",
@@ -36,4 +38,6 @@ __all__ = [
     "AutomationTargetCustomer",
     "Campaign", "CampaignTriggerType",
     "CampaignCustomer",
+    "Conversation",
+    "Message", "MessageDirection", "MessageStatus",
 ]

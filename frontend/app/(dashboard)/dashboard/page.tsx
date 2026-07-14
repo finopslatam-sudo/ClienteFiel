@@ -107,6 +107,7 @@ export default function DashboardPage() {
         </div>
       ) : summary ? (
         <motion.div
+          id="tour-dashboard-metrics"
           variants={staggerContainer}
           initial="hidden"
           animate="visible"

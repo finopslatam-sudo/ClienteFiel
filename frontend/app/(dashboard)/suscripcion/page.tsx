@@ -169,7 +169,7 @@ function SuscripcionContent() {
   const isActive = subscription?.status === 'active'
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div id="tour-suscripcion-plan" className="max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold mb-2" style={{ color: '#f1f5f9' }}>
         Suscripción
       </h1>

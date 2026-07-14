@@ -6,6 +6,7 @@ import { es } from 'date-fns/locale'
 import { motion } from 'framer-motion'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
 import api from '@/lib/api'
+import { ConversationSheet } from '@/components/clientes/ConversationSheet'
 
 interface Customer {
   id: string
@@ -73,6 +74,7 @@ export default function ClientesPage() {
   const [orderBy, setOrderBy] = useState<SortField>('last_booking_at')
   const [orderDir, setOrderDir] = useState<SortDir>('desc')
   const [offset, setOffset] = useState(0)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['customers', search, status, orderBy, orderDir, offset],
@@ -144,7 +146,7 @@ export default function ClientesPage() {
       </div>
 
       {/* Tabla */}
-      <div className="glass-card overflow-hidden">
+      <div id="tour-clientes-table" className="glass-card overflow-hidden">
         {/* Encabezados */}
         <div
           className="hidden md:grid text-xs font-medium px-5 py-3"
@@ -191,8 +193,11 @@ export default function ClientesPage() {
               <motion.div
                 key={c.id}
                 variants={fadeInUp}
-                className="px-5 py-3.5 grid items-center gap-4"
+                onClick={() => setSelectedCustomer(c)}
+                className="px-5 py-3.5 grid items-center gap-4 cursor-pointer transition-colors"
                 style={{ gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(6,182,212,0.04)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
               >
                 {/* Cliente */}
                 <div>
@@ -269,6 +274,14 @@ export default function ClientesPage() {
           </div>
         )}
       </div>
+
+      <ConversationSheet
+        customerId={selectedCustomer?.id ?? null}
+        customerName={selectedCustomer?.name ?? null}
+        phoneNumber={selectedCustomer?.phone_number ?? null}
+        open={selectedCustomer !== null}
+        onOpenChange={(open) => { if (!open) setSelectedCustomer(null) }}
+      />
     </div>
   )
 }
